@@ -1,10 +1,13 @@
 import type { NextPage } from "next";
+import Image from "next/image";
+import Background from "../../public/images/Background.png";
 
 const Page: NextPage = () => {
   return (
-    <>
-      <h1>NextGenROI app home</h1>
-    </>
+    <main>
+      <Image alt="Background" src={Background} className="z-[-10] absolute" />
+      Main Page
+    </main>
   );
 };
 
