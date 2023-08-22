@@ -9,7 +9,7 @@ const MenuButton = () => {
   return (
     <>
       <details
-        className="dropdown dropdown-end block md:hidden "
+        className="dropdown dropdown-end block lg:hidden "
         onClick={() => setOpen((p) => !p)}
       >
         <summary

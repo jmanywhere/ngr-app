@@ -6,17 +6,33 @@ import MenuButton from "./MenuButton";
 
 const Header = () => {
   return (
-    <header className="flex align-middle justify-between bg-white w-full fixed top-0 z-50">
-      <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
+    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 px-6 py-2">
+      <Link href="/">
+        <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
+      </Link>
       <MenuButton />
-      <nav className="hidden md:block">
-        <Link href="/">Home</Link>
-        <a href="#FAQ">FAQ</a>
-        <a href="#Lottery">Lotery</a>
-        <a href="#TradingBot">Trading Bot</a>
-        <a href="#Socials">Socials</a>
-        <a href="#Audit">Audit</a>
-        <a href="#Invest">Invest</a>
+      <nav className="hidden lg:block px-3">
+        <a href="#FAQ" className="text-black px-6 text-lg font-medium">
+          FAQs
+        </a>
+        <a href="#Lottery" className="text-black px-6 text-lg font-medium">
+          Lotery
+        </a>
+        <a href="#TradingBot" className="text-black px-6 text-lg font-medium">
+          Trading Bot
+        </a>
+        <a href="#Socials" className="text-black px-6 text-lg font-medium">
+          Socials
+        </a>
+        <a href="#Audit" className="text-black px-6 text-lg font-medium">
+          Audit
+        </a>
+        <a
+          href="#Invest"
+          className="text-black px-6 rounded bg-[#04BF55] py-3 text-lg font-medium"
+        >
+          Invest
+        </a>
       </nav>
     </header>
   );
