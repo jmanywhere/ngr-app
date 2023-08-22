@@ -3,12 +3,12 @@ import logo from "../../../public/images/Logo_1.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#1F2126] px-5 mt-5">
-      <div className="flex flex-col items-center pb-6 w-[100vw]">
+    <footer className="bg-[#1F2126] px-5 pt-6 lg:pt-12 flex flex-col items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:max-w-[500px] items-center pb-6 w-[100vw]">
         <Image
           src={logo}
           alt="NextGen Logo"
-          className="w-[141px] h-[150] py-5"
+          className="w-[141px] h-[150] py-5 lg:mr-10"
         />
         <div className="flex flex-col md:flex-row md:max-w-[250px] md:w-full md:justify-between">
           <div className="flex flex-col items-center text-white pb-4">
@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="border-t-2 border-white text-white text-xs text-center py-3">
+      <div className="border-t-2 border-white text-white text-xs text-center py-3 pb-5 max-w-[1440px] w-full">
         Copyright © 2022 NextGenROI, all rights reserved
       </div>
     </footer>
