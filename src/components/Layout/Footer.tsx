@@ -37,7 +37,11 @@ const Footer = () => {
               <a href="#Discord" className="text-sm py-2">
                 Discord
               </a>
-              <a href="#Telegram" className="text-sm py-2">
+              <a
+                href="https://t.me/nextgenroi"
+                rel="noopenner"
+                className="text-sm py-2"
+              >
                 Telegram
               </a>
             </nav>

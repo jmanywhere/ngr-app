@@ -15,24 +15,24 @@ const Header = () => {
         <a href="#FAQ" className="text-black px-6 text-lg font-medium">
           FAQs
         </a>
-        <a href="#Lottery" className="text-black px-6 text-lg font-medium">
+        {/* <a href="#Lottery" className="text-black px-6 text-lg font-medium">
           Lotery
         </a>
         <a href="#TradingBot" className="text-black px-6 text-lg font-medium">
           Trading Bot
-        </a>
+        </a> */}
         <a href="#Socials" className="text-black px-6 text-lg font-medium">
           Socials
         </a>
         <a href="#Audit" className="text-black px-6 text-lg font-medium">
           Audit
         </a>
-        <a
-          href="#Invest"
+        <Link
+          href="/app"
           className="text-black px-6 rounded bg-[#04BF55] py-3 text-lg font-medium"
         >
           Invest
-        </a>
+        </Link>
       </nav>
     </header>
   );

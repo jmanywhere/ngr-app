@@ -7,7 +7,7 @@ import Logo from "../../public/images/Logo.png";
 const Page: NextPage = () => {
   return (
     <main className="mt-[65px] flex flex-col items-center ">
-      <section className="flex flex-col lg:flex-row items-center p-6 lg:p-28 bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080">
+      <section className="flex flex-col lg:flex-row items-center justify-center p-6 lg:p-28 bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 bg-cover w-full">
         <div className="mb-5 lg:order-2 lg:max-w-[500px]">
           <Image alt="logo" src={barsAndLogo} />
         </div>
