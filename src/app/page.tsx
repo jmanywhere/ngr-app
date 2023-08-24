@@ -7,7 +7,7 @@ import Logo from "../../public/images/Logo.png";
 const Page: NextPage = () => {
   return (
     <main className="mt-[65px] flex flex-col items-center ">
-      <section className="flex flex-col lg:flex-row items-center p-6 lg:p-28 bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080">
+      <section className="flex flex-col lg:flex-row items-center justify-center p-6 lg:p-28 bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 bg-cover w-full">
         <div className="mb-5 lg:order-2 lg:max-w-[500px]">
           <Image alt="logo" src={barsAndLogo} />
         </div>
@@ -27,15 +27,12 @@ const Page: NextPage = () => {
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 md:mb-12 lg:mb-16">
             Available on Binance Smart Chain. Other chains coming soon!
           </p>
-          <a
-            href=""
-            className="rounded bg-[#04BF55] text-[black] text-lg  px-6 py-2"
-          >
+          <a href="" className="btn btn-primary capitalize text-black  px-6">
             Invest
           </a>
         </div>
       </section>
-      <section className="bg-[#1F2126] pt-20 pb-5 md:pb-14 lg:px-6 flex flex-col lg:flex-row lg:items-center w-full lg:justify-center">
+      <section className="bg-[#16171c] pt-20 pb-5 md:pb-14 lg:px-6 flex flex-col lg:flex-row lg:items-center w-full lg:justify-center">
         <div className="mb-12 lg:max-w-[500px]">
           <Image alt="graph" src={barsAndGuy} />
         </div>
@@ -80,7 +77,7 @@ const Page: NextPage = () => {
           </ol>
           <a
             href=""
-            className="self-end bg-[#00bf62] text-[black] rounded px-6 py-2 text-lg"
+            className="self-end btn btn-primary capitalize text-[black] rounded px-6 py-2"
           >
             Read More
           </a>
