@@ -6,30 +6,30 @@ import MenuButton from "./MenuButton";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 px-6 py-2">
+    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 px-6 py-2 border-b-[1px] border-black">
       <Link href="/">
         <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
       </Link>
       <MenuButton />
-      <nav className="hidden lg:block px-3">
-        <a href="#FAQ" className="text-black px-6 text-lg font-medium">
+      <nav className="hidden text-sm lg:block px-3">
+        <a href="#FAQ" className="text-black px-6 font-medium">
           FAQs
         </a>
-        {/* <a href="#Lottery" className="text-black px-6 text-lg font-medium">
+        {/* <a href="#Lottery" className="text-black px-6 font-medium">
           Lotery
         </a>
-        <a href="#TradingBot" className="text-black px-6 text-lg font-medium">
+        <a href="#TradingBot" className="text-black px-6 font-medium">
           Trading Bot
         </a> */}
-        <a href="#Socials" className="text-black px-6 text-lg font-medium">
+        <a href="#Socials" className="text-black px-6 font-medium">
           Socials
         </a>
-        <a href="#Audit" className="text-black px-6 text-lg font-medium">
+        <a href="#Audit" className="text-black px-6 font-medium">
           Audit
         </a>
         <Link
           href="/app"
-          className="text-black px-6 rounded bg-[#04BF55] py-3 text-lg font-medium"
+          className="text-black px-6 btn-primary btn py-3 text-sm font-medium capitalize"
         >
           Invest
         </Link>

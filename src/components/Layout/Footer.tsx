@@ -3,7 +3,7 @@ import logo from "../../../public/images/Logo_1.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#1F2126] px-5 pt-6 lg:pt-12 flex flex-col items-center">
+    <footer className="bg-[#16171c] px-5 pt-6 lg:pt-12 flex flex-col items-center">
       <div className="flex flex-col lg:flex-row lg:justify-between lg:max-w-[500px] items-center pb-6 w-[100vw]">
         <Image
           src={logo}
@@ -48,7 +48,10 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="border-t-2 border-white text-white text-xs text-center py-3 pb-5 max-w-[1440px] w-full">
+      <div
+        className="border-t-2 border-white text-white text-xs text-center py-3 pb-5 max-w-[1440px] w-full"
+        id="Socials"
+      >
         Copyright © 2022 NextGenROI, all rights reserved
       </div>
     </footer>

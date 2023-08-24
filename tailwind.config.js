@@ -3,6 +3,15 @@ module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  daisyui:{
+    themes: [
+      {
+        'mytheme': {                          //your theme name
+          'primary': '#04BF55',                //primary color
+        }
+      },
+    ],
+  },
   theme: {
     extend: {
       backgroundImage: {
