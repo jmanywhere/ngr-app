@@ -12,19 +12,19 @@ const Header = () => {
       </Link>
       <MenuButton />
       <nav className="hidden text-sm lg:block px-3">
-        <a href="#FAQ" className="text-black px-6 font-medium">
+        <a href="#FAQ" className="text-black px-6">
           FAQs
         </a>
-        {/* <a href="#Lottery" className="text-black px-6 font-medium">
+        {/* <a href="#Lottery" className="text-black px-6">
           Lotery
         </a>
-        <a href="#TradingBot" className="text-black px-6 font-medium">
+        <a href="#TradingBot" className="text-black px-6">
           Trading Bot
         </a> */}
-        <a href="#Socials" className="text-black px-6 font-medium">
+        <a href="#Socials" className="text-black px-6">
           Socials
         </a>
-        <a href="#Audit" className="text-black px-6 font-medium">
+        <a href="#Audit" className="text-black px-6">
           Audit
         </a>
         <Link
