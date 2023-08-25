@@ -98,7 +98,7 @@ export const StatsCard = () => {
   }, [ngrDataRefetch]);
 
   return (
-    <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-4 max-w-sm lg:max-w-md md:max-w-[600px] w-full">
+    <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px] lg:max-w-[580px] w-full">
       <div className="relative w-full flex flex-col items-center">
         <h2 className="font-bold text-2xl py-1 w-full text-center pb-3 uppercase">
           Stats
@@ -269,13 +269,13 @@ export const ActionsCard = () => {
 
   return (
     <>
-      <div className="text-black py-4 px-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-4">
+      <div className="text-black pt-7 pb-4 px-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-4 md:max-w-[600px] lg:max-w-[300px] w-full">
         <h2 className="font-bold text-2xl pb-4">Actions</h2>
         <div className="py-3 w-full flex flex-col items-center">
           <div className="join ">
             <div className="form-control w-full join-item pb-3">
               <input
-                className="input input-bordered rounded-r-none input-primary w-full max-w-xs"
+                className="input rounded-r-none input-primary w-full border-r-0"
                 placeholder="Type Number"
                 type="number"
                 value={depositAmount}
@@ -294,6 +294,11 @@ export const ActionsCard = () => {
                 </span>
               </label>
             </div>
+            <div className="form-control join-item ">
+              <label className="label cursor-pointer border-y-primary border-y-[1px] py-[11px]">
+                <input type="checkbox" checked="checked" className="checkbox" />
+              </label>
+            </div>
             <button
               className="btn btn-primary rounded-l-none"
               onClick={() => {
@@ -307,7 +312,7 @@ export const ActionsCard = () => {
           </div>
           <button
             className={classNames(
-              "btn w-full",
+              "btn w-full md:max-w-[300px]",
               isApproved ? "btn-primary" : "btn-secondary",
               prepDepositError ? "btn-disabled" : ""
             )}
