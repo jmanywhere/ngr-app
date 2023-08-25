@@ -10,30 +10,44 @@ const Header = () => {
       <Link href="/">
         <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
       </Link>
-      <MenuButton />
-      <nav className="hidden text-sm lg:block px-3">
-        <a href="#FAQ" className="text-black px-6">
-          FAQs
-        </a>
-        {/* <a href="#Lottery" className="text-black px-6">
+      <div className="flex flex-row items-center">
+        <MenuButton />
+        <nav className="hidden text-sm lg:flex px-3 flex-row items-center gap-3">
+          <a
+            href="#FAQ"
+            className="btn btn-link no-underline font-light capitalize text-black px-3"
+          >
+            FAQs
+          </a>
+          {/* <a href="#Lottery" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Lotery
         </a>
-        <a href="#TradingBot" className="text-black px-6">
+        <a href="#TradingBot" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Trading Bot
         </a> */}
-        <a href="#Socials" className="text-black px-6">
-          Socials
-        </a>
-        <a href="#Audit" className="text-black px-6">
-          Audit
-        </a>
-        <Link
-          href="/app"
-          className="text-black px-6 btn-primary btn py-3 text-sm font-medium capitalize"
-        >
-          Invest
-        </Link>
-      </nav>
+          <a
+            href="#Socials"
+            className="btn btn-link no-underline font-light capitalize text-black px-3"
+          >
+            Socials
+          </a>
+          <a
+            href="#Audit"
+            className="btn btn-link no-underline font-light capitalize text-black px-3"
+          >
+            Audit
+          </a>
+          <Link
+            href="/app"
+            className="text-black px-6 btn-primary btn text-sm font-medium capitalize"
+          >
+            Invest
+          </Link>
+        </nav>
+        <div className="hidden md:block">
+          <Web3HeaderBtn />
+        </div>
+      </div>
     </header>
   );
 };

@@ -13,7 +13,7 @@ const MenuButton = () => {
     >
       <summary
         className={classNames(
-          " btn bg-white swap swap-rotate w-full h-full z-10 border-none text-black",
+          " btn bg-white swap swap-rotate w-full h-full z-10 border-none text-black hover:text-white",
           open ? "swap-active" : ""
         )}
       >
