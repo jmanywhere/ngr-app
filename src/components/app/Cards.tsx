@@ -295,11 +295,11 @@ export const ActionsCard = () => {
                 </span>
               </label>
             </div>
-            <div className="form-control join-item ">
+            {/* <div className="form-control join-item ">
               <label className="label cursor-pointer border-y-primary border-y-[1px] py-[11px]">
                 <input type="checkbox" className="checkbox checkbox-primary" />
               </label>
-            </div>
+            </div> */}
             <button
               className="btn btn-primary rounded-l-none"
               onClick={() => {
