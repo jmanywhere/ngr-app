@@ -47,9 +47,9 @@ const Page: NextPage = () => {
             <li className="pb-2 text-sm md:text-base">
               6% guaranteed return (approximately 134% APY)
             </li>
-            <li className="pb-2 text-sm md:text-base">
+            {/* <li className="pb-2 text-sm md:text-base">
               Auto-reinvestment option to maximize APY
-            </li>
+            </li> */}
             <li className="pb-2 text-sm md:text-base">Fully collateralized</li>
             <li className="pb-2 text-sm md:text-base">
               FIFO liquidation system

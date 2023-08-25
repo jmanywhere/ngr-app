@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0x431c3A01A4D5d22c18c721A8F8254910fAF9760d";
+const ngrContract = "0x887f34c78a491ADae112E3390Ed7b2f52074a2e7";
 
 const ngrConfig = {
   address: ngrContract,
@@ -60,6 +60,11 @@ export const StatsCard = () => {
         functionName: "getUserPositions",
         args: [address || zeroAddress],
       },
+      {
+        ...ngrConfig,
+        functionName: "userStats",
+        args: [address || zeroAddress],
+      },
     ],
   });
   const [selectedPosition, setSelectedPosition] = useState(0);
@@ -74,68 +79,97 @@ export const StatsCard = () => {
       currentUserPendingLiquidation: (ngrData?.[5].result as bigint) || 0n,
       deposits: (ngrData?.[6].result as bigint) || 0n,
       totalUserPositions: (ngrData?.[7].result as bigint[]) || [],
+      userStats: (ngrData?.[8].result as bigint[]) || [],
     };
   }, [ngrData]);
+  console.log({ ...statsData });
 
   const positionSelected =
     statsData.totalUserPositions.length > 0
       ? statsData.totalUserPositions[selectedPosition]
       : 0n;
 
-  const { data: positionData } = useContractRead({
+  const { data: positionData, refetch: positionRefetch } = useContractRead({
     ...ngrConfig,
     functionName: "positions",
     args: [positionSelected],
   });
 
   useEffect(() => {
-    const interval = setInterval(ngrDataRefetch, 10000);
+    const interval = setInterval(() => {
+      ngrDataRefetch();
+      positionRefetch();
+    }, 10000);
     return () => clearInterval(interval);
-  }, [ngrDataRefetch]);
+  }, [ngrDataRefetch, positionRefetch]);
 
   return (
-    <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px] lg:max-w-[580px] w-full">
-      <div className="relative w-full flex flex-col items-center">
-        <h2 className="font-bold text-2xl py-1 w-full text-center pb-3 uppercase">
-          Stats
+    <>
+      <section className="flex flex-col">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
+          Global Stats
         </h2>
-        <div className="lg:absolute right-0 top-0 pb-3">
-          <Web3Button />
+        <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 w-[210px] md:w-auto">
+          <div className="stat">
+            <p className="stat-title text-slate-400">Helix Price</p>
+            <p className="stat-value">
+              {parseFloat(formatEther(statsData.helixPrice)).toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-500">USD</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-400">TCV</p>
+            <p className="stat-value">
+              {parseFloat(formatEther(statsData.tcv)).toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-500">Total Value USDT</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-400">Cycle</p>
+            <p className="stat-value">
+              {statsData.cycleCounter.toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-500">
+              Times Price has reset
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="w-full px-6 pb-4">
-        <div className="flex justify-between">
-          <p className="font-bold">Helix Price</p>
-          <p>
-            {parseFloat(formatEther(statsData.helixPrice)).toLocaleString()}
+      </section>
+      <div className="stats stats-vertical md:stats-horizontal shadow text-accent w-[210px] md:w-auto">
+        <div className="stat">
+          <p className="stat-title text-slate-400">Next Pos.</p>
+          <p className="stat-value">
+            {statsData.currentUserPendingLiquidation.toLocaleString()}
           </p>
+          <p className="stat-desc text-slate-500">Liquidated</p>
         </div>
-        <div className="flex justify-between">
-          <p className="font-bold">TCV</p>
-          <p>{parseFloat(formatEther(statsData.tcv)).toLocaleString()}</p>
+        <div className="stat">
+          <p className="stat-title text-slate-400">Liquidated</p>
+          <p className="stat-value">
+            {statsData.liquidations.toLocaleString()}
+          </p>
+          <p className="stat-desc text-slate-500">Total Positions Liquidates</p>
         </div>
-        <div className="flex justify-between">
-          <p className="font-bold">Cycle</p>
-          <p>{statsData.cycleCounter.toLocaleString()}</p>
-        </div>
-        <div className="flex justify-between">
-          <p className="font-bold">Next Position Liquidated</p>
-          <p>{statsData.currentUserPendingLiquidation.toLocaleString()}</p>
-        </div>
-        <div className="flex justify-between">
-          <p className="font-bold">Total Liquidated</p>
-          <p>{statsData.liquidations.toLocaleString()}</p>
-        </div>
-        <div className="flex justify-between">
-          <p className="font-bold">Total Active Deposits</p>
-          <p>
+        <div className="stat">
+          <p className="stat-title text-slate-400">Deposits</p>
+          <p className="stat-value">
             {(
               statsData.totalPositions - statsData.liquidations
             ).toLocaleString()}
           </p>
+          <p className="stat-desc text-slate-500">Active Deposits</p>
         </div>
       </div>
-      <div className="w-full px-6 pb-4 border-b-4 border-secondary mb-4">
+      <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px] lg:max-w-[580px] w-full">
+        <div className="relative w-full flex flex-col items-center">
+          <h2 className="font-bold text-2xl py-1 w-full text-center pb-3 uppercase">
+            Stats
+          </h2>
+          <div className="lg:absolute right-0 top-0 pb-3">
+            <Web3Button />
+          </div>
+        </div>
+        {/* <div className="w-full px-6 pb-4 mb-4">
         <div className="flex justify-between">
           <p className="font-bold">Enough TCV</p>
           <p className="uppercase">
@@ -148,67 +182,72 @@ export const StatsCard = () => {
             {statsData.deposits - statsData.liquidations > 20}
           </p>
         </div>
+      </div> */}
+        <div className="pb-5 w-full px-6 border-t-4 pt-4 border-secondary">
+          <h3 className="text-xl font-bold">Your Stats</h3>
+          <div className="flex justify-between">
+            <p className="font-bold">Positions:</p>
+            <p>{statsData.totalUserPositions.length.toLocaleString()}</p>
+          </div>
+          <div className="flex flex-row items-center justify-center pt-2 gap-x-2">
+            <button
+              onClick={() => setSelectedPosition((p) => (p == 0 ? 0 : p - 1))}
+              className={classNames(
+                "btn btn-circle btn-outline btn-sm btn-secondary",
+                selectedPosition == 0 ? "btn-disabled" : ""
+              )}
+            >
+              {"<"}
+            </button>
+            <p className="px-3">
+              Position: {positionSelected.toLocaleString()}
+            </p>
+            <button
+              onClick={() =>
+                setSelectedPosition((p) => {
+                  if (statsData.totalUserPositions.length === 0) return 0;
+                  else
+                    return p === statsData.totalUserPositions.length - 1
+                      ? p
+                      : p + 1;
+                })
+              }
+              className={classNames(
+                "btn btn-circle btn-secondary btn-outline btn-sm",
+                statsData.totalUserPositions.length == 0 ||
+                  selectedPosition == statsData.totalUserPositions.length - 1
+                  ? "btn-disabled"
+                  : ""
+              )}
+            >
+              {">"}
+            </button>
+          </div>
+        </div>
+        <div className="border-[#333] border-4 rounded-lg w-full py-3 px-6">
+          <div className="flex justify-between pb-1">
+            <p className="font-bold">Deposit Amount:</p>
+            <p>
+              {parseFloat(
+                formatEther(positionData?.[1] || 0n)
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="flex justify-between pb-1">
+            <p className="font-bold">Liquidation Amount:</p>
+            <p>
+              {parseFloat(
+                formatEther(((positionData?.[1] || 0n) * 106n) / 100n)
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="flex justify-between pb-1">
+            <p className="font-bold">Is Liquidated:</p>
+            <p>{positionData?.[7] ? "TRUE" : "FALSE"}</p>
+          </div>
+        </div>
       </div>
-      <div className="pb-5 w-full px-6">
-        <h3 className="text-xl font-bold">Your Stats</h3>
-        <div className="flex justify-between">
-          <p className="font-bold">Positions:</p>
-          <p>{statsData.totalUserPositions.length.toLocaleString()}</p>
-        </div>
-        <div className="flex flex-row items-center justify-center pt-2 gap-x-2">
-          <button
-            onClick={() => setSelectedPosition((p) => (p == 0 ? 0 : p - 1))}
-            className={classNames(
-              "btn btn-circle btn-outline btn-sm btn-secondary",
-              selectedPosition == 0 ? "btn-disabled" : ""
-            )}
-          >
-            {"<"}
-          </button>
-          <p className="px-3">Position: {positionSelected.toLocaleString()}</p>
-          <button
-            onClick={() =>
-              setSelectedPosition((p) => {
-                if (statsData.totalUserPositions.length === 0) return 0;
-                else
-                  return p === statsData.totalUserPositions.length - 1
-                    ? p
-                    : p + 1;
-              })
-            }
-            className={classNames(
-              "btn btn-circle btn-secondary btn-outline btn-sm",
-              statsData.totalUserPositions.length == 0 ||
-                selectedPosition == statsData.totalUserPositions.length - 1
-                ? "btn-disabled"
-                : ""
-            )}
-          >
-            {">"}
-          </button>
-        </div>
-      </div>
-      <div className="border-[#333] border-4 rounded-lg w-full py-3 px-6">
-        <div className="flex justify-between pb-1">
-          <p className="font-bold">Deposit Amount:</p>
-          <p>
-            {parseFloat(formatEther(positionData?.[1] || 0n)).toLocaleString()}
-          </p>
-        </div>
-        <div className="flex justify-between pb-1">
-          <p className="font-bold">Liquidation Amount:</p>
-          <p>
-            {parseFloat(
-              formatEther(((positionData?.[1] || 0n) * 106n) / 100n)
-            ).toLocaleString()}
-          </p>
-        </div>
-        <div className="flex justify-between pb-1">
-          <p className="font-bold">Is Liquidated:</p>
-          <p>{positionData?.[7] ? "TRUE" : "FALSE"}</p>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
@@ -235,7 +274,6 @@ export const ActionsCard = () => {
   });
 
   const [depositAmount, setDepositAmount] = useState(0);
-  const [enableRedeposit, setEnableRedeposit] = useState(false);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
     address: TEST_USDT_ADDRESS,
@@ -248,7 +286,7 @@ export const ActionsCard = () => {
     usePrepareContractWrite({
       ...ngrConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`), enableRedeposit],
+      args: [parseEther(`${depositAmount}`)],
     });
 
   const { write: deposit, data: depositData } = useContractWrite(
@@ -283,7 +321,7 @@ export const ActionsCard = () => {
           <div className="join">
             <div className="form-control w-full join-item">
               <input
-                className="input rounded-r-none input-primary w-full border-r-0"
+                className="input rounded-r-none input-primary w-full border-r-0 text-white"
                 placeholder="Type Number"
                 type="number"
                 value={depositAmount}
@@ -318,17 +356,10 @@ export const ActionsCard = () => {
               Max
             </button>
           </div>
-          <div className="form-control">
-            <label className="label cursor-pointer">
-              <span className="label-text text-black pr-4">Redeposit</span>
-              <input
-                type="checkbox"
-                checked={enableRedeposit}
-                className="checkbox checkbox-primary"
-                onChange={(e) => setEnableRedeposit((p) => !p)}
-              />
-            </label>
-          </div>
+          {(depositAmount === 0 && isApproved && (
+            <span className="text-sm text-error">Min Deposit: 5 USDT</span>
+          )) ||
+            null}
           <button
             className={classNames(
               "btn w-full md:max-w-[300px]",
@@ -342,10 +373,6 @@ export const ActionsCard = () => {
           >
             {isApproved ? "deposit" : "approve"}
           </button>
-          {(depositAmount === 0 && isApproved && (
-            <span className="text-sm text-error">Min Deposit: 5 USDT</span>
-          )) ||
-            null}
         </div>
         <div className="flex flex-col items-center py-5">
           <p className="text-sm">DISCLAIMER PENDING!!!</p>

@@ -9,7 +9,9 @@ module.exports = {
       {
         'mytheme': {                          //your theme name
           'primary': '#04BF55',                //primary color
-          'secondary': "#204FC0"
+          'secondary': "#204FC0",
+          'accent': "#5eead4",
+          "base-100": "rgb(15, 23, 42)"
         }
       },
     ],

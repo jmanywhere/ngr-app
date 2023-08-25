@@ -39,25 +39,37 @@ const MenuButton = () => {
           <polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49" />
         </svg>
       </summary>
-      <nav className="shadow menu dropdown-content bg-white w-[100vw] text-black text-center">
-        <a href="#FAQ" className="p-4 text-lg">
+      <nav className="shadow menu flex flex-col gap-y-4 dropdown-content bg-white w-[100vw] text-black text-center">
+        <a
+          href="#FAQ"
+          className="btn btn-link text-lg no-underline text-black font-light"
+        >
           FAQ
         </a>
-        <a href="#Lottery" className="p-4 text-lg">
+        {/* <a href="#Lottery" className="p-4 text-lg">
           Lotery
         </a>
         <a href="#TradingBot" className="p-4 text-lg">
           Trading Bot
-        </a>
-        <a href="#Socials" className="p-4 text-lg">
+        </a> */}
+        <a
+          href="#Socials"
+          className="btn btn-link text-lg no-underline text-black font-light"
+        >
           Socials
         </a>
-        <a href="#Audit" className="p-4 text-lg">
+        <a
+          href="#Audit"
+          className="btn btn-link text-lg no-underline text-black font-light"
+        >
           Audit
         </a>
-        <a href="#Invest" className="p-4 font-medium bg-[#04BF55] text-lg">
+        <Link
+          href="/app"
+          className="p-4 btn btn-primary capitalize font-normal text-black mb-2"
+        >
           Invest
-        </a>
+        </Link>
         <Web3HeaderBtn />
       </nav>
     </details>

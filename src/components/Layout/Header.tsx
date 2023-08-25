@@ -6,7 +6,7 @@ import MenuButton from "./MenuButton";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 px-6 py-2 border-b-[1px] border-black">
+    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 pl-6 pr-0 lg:pr-6 py-2 border-b-[1px] border-black">
       <Link href="/">
         <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
       </Link>
