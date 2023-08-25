@@ -296,7 +296,7 @@ export const ActionsCard = () => {
             </div>
             <div className="form-control join-item ">
               <label className="label cursor-pointer border-y-primary border-y-[1px] py-[11px]">
-                <input type="checkbox" checked="checked" className="checkbox" />
+                <input type="checkbox" className="checkbox checkbox-primary" />
               </label>
             </div>
             <button
