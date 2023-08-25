@@ -109,7 +109,7 @@ export const StatsCard = () => {
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
           Global Stats
         </h2>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 w-[210px] md:w-auto">
+        <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
           <div className="stat">
             <p className="stat-title text-slate-400">Helix Price</p>
             <p className="stat-value">
@@ -135,7 +135,7 @@ export const StatsCard = () => {
           </div>
         </div>
       </section>
-      <div className="stats stats-vertical md:stats-horizontal shadow text-accent w-[210px] md:w-auto">
+      <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
         <div className="stat">
           <p className="stat-title text-slate-400">Next Pos.</p>
           <p className="stat-value">
@@ -160,7 +160,112 @@ export const StatsCard = () => {
           <p className="stat-desc text-slate-500">Active Deposits</p>
         </div>
       </div>
-      <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px] lg:max-w-[580px] w-full">
+      <section className="flex flex-col">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
+          Personal Stats
+        </h2>
+        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
+          <div className="stat">
+            <p className="stat-title text-slate-300">Total</p>
+            <p className="stat-value">
+              {statsData.userStats[3].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total deposits</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Active</p>
+            <p className="stat-value">
+              {(
+                statsData.userStats[3] -
+                statsData.userStats[4] -
+                statsData.userStats[5]
+              ).toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Deposits Pending</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Liquidations</p>
+            <p className="stat-value">
+              {statsData.userStats[4].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total Liquidations</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Last</p>
+            <p className="stat-value">
+              {statsData.userStats[4].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">
+              Position Id Liquidated
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="stats stats-vertical md:stats-horizontal shadow text-slate-100 bg-emerald-900 ">
+        <div className="stat">
+          <p className="stat-title text-slate-300">Deposited</p>
+          <p className="stat-value">
+            {parseFloat(formatEther(statsData.userStats[0])).toLocaleString()}
+          </p>
+          <div className="stat-desc text-slate-400">USDT</div>
+        </div>
+        <div className="stat">
+          <p className="stat-title text-slate-300">Liquidations</p>
+          <p className="stat-value">
+            {parseFloat(formatEther(statsData.userStats[4])).toLocaleString()}
+          </p>
+          <div className="stat-desc text-slate-400">USDT</div>
+        </div>
+        <div className="stat">
+          <p className="stat-title text-slate-300">Last</p>
+          <p className="stat-value">
+            {statsData.userStats[6].toLocaleString()}
+          </p>
+          <div className="stat-desc text-slate-400">Position Id Liquidated</div>
+        </div>
+      </div>
+      <section className="flex flex-col">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
+          Your Positions
+        </h2>
+        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
+          <div className="stat">
+            <p className="stat-title text-slate-300">Total</p>
+            <p className="stat-value">
+              {statsData.userStats[3].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total deposits</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Active</p>
+            <p className="stat-value">
+              {(
+                statsData.userStats[3] -
+                statsData.userStats[4] -
+                statsData.userStats[5]
+              ).toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Deposits Pending</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Liquidations</p>
+            <p className="stat-value">
+              {statsData.userStats[4].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total Liquidations</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Last</p>
+            <p className="stat-value">
+              {statsData.userStats[4].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">
+              Position Id Liquidated
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px]  w-full">
         <div className="relative w-full flex flex-col items-center">
           <h2 className="font-bold text-2xl py-1 w-full text-center pb-3 uppercase">
             Stats
