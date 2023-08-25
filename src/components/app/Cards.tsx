@@ -342,9 +342,10 @@ export const ActionsCard = () => {
           >
             {isApproved ? "deposit" : "approve"}
           </button>
-          {depositAmount === 0 && (
+          {(depositAmount === 0 && isApproved && (
             <span className="text-sm text-error">Min Deposit: 5 USDT</span>
-          )}
+          )) ||
+            null}
         </div>
         <div className="flex flex-col items-center py-5">
           <p className="text-sm">DISCLAIMER PENDING!!!</p>
