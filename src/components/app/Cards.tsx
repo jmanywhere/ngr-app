@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0xf089e8e4590DB70AAA40ba38E8f92186A59567AC";
+const ngrContract = "0x6137e67437B08f08033170c902C85447F018F135";
 
 const ngrConfig = {
   address: ngrContract,
@@ -239,12 +239,13 @@ export const ActionsCard = () => {
   });
 
   const [depositAmount, setDepositAmount] = useState(0);
+  const [enableRedeposit, setEnableRedeposit] = useState(false);
 
   const { config: depositConfig, error: prepDepositError } =
     usePrepareContractWrite({
       ...ngrConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`), false],
+      args: [parseEther(`${depositAmount}`), enableRedeposit],
     });
 
   console.log({ prepDepositError });
@@ -272,8 +273,8 @@ export const ActionsCard = () => {
       <div className="text-black py-4 px-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-4">
         <h2 className="font-bold text-2xl pb-4">Actions</h2>
         <div className="py-3 w-full flex flex-col items-center">
-          <div className="join ">
-            <div className="form-control w-full join-item pb-3">
+          <div className="join">
+            <div className="form-control w-full join-item">
               <input
                 className="input input-bordered rounded-r-none input-primary w-full max-w-xs"
                 placeholder="Type Number"
@@ -305,18 +306,32 @@ export const ActionsCard = () => {
               Max
             </button>
           </div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text text-black pr-4">Redeposit</span>
+              <input
+                type="checkbox"
+                checked={enableRedeposit}
+                className="checkbox checkbox-primary"
+                onChange={(e) => setEnableRedeposit((p) => !p)}
+              />
+            </label>
+          </div>
           <button
             className={classNames(
               "btn w-full",
               isApproved ? "btn-primary" : "btn-secondary",
-              prepDepositError ? "btn-disabled" : ""
+              prepDepositError ? "btn-disabled" : "",
+              depositLoading ? "btn-loading loading-ring" : ""
             )}
+            onClick={() => {
+              isApproved ? deposit?.() : null;
+            }}
           >
             {isApproved ? "deposit" : "approve"}
           </button>
         </div>
         <div className="flex flex-col items-center py-5">
-          <button className="btn btn-primary mb-4">Early Withdraw</button>
           <p className="text-sm">DISCLAIMER PENDING!!!</p>
         </div>
       </div>
