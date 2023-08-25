@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0x6137e67437B08f08033170c902C85447F018F135";
+const ngrContract = "0x431c3A01A4D5d22c18c721A8F8254910fAF9760d";
 
 const ngrConfig = {
   address: ngrContract,
@@ -63,10 +63,6 @@ export const StatsCard = () => {
     ],
   });
   const [selectedPosition, setSelectedPosition] = useState(0);
-
-  const depositAmount = 0; //fines ilustrativos
-  const liquidationAmount = 0; //fines ilustrativos
-  const untilAmount = 0; //fines ilustrativos
 
   const statsData = useMemo(() => {
     return {
@@ -241,6 +237,13 @@ export const ActionsCard = () => {
   const [depositAmount, setDepositAmount] = useState(0);
   const [enableRedeposit, setEnableRedeposit] = useState(false);
 
+  const { config: prepApproveConfig } = usePrepareContractWrite({
+    address: TEST_USDT_ADDRESS,
+    abi: erc20ABI,
+    functionName: "approve",
+    args: [ngrContract, parseEther(`${1_000_000}`)],
+  });
+
   const { config: depositConfig, error: prepDepositError } =
     usePrepareContractWrite({
       ...ngrConfig,
@@ -248,13 +251,17 @@ export const ActionsCard = () => {
       args: [parseEther(`${depositAmount}`), enableRedeposit],
     });
 
-  console.log({ prepDepositError });
-
   const { write: deposit, data: depositData } = useContractWrite(
     depositConfig || null
   );
+  const { write: approve, data: approveData } = useContractWrite(
+    prepApproveConfig || null
+  );
   const { isLoading: depositLoading } = useWaitForTransaction({
     hash: depositData?.hash,
+  });
+  const { isLoading: approveLoading } = useWaitForTransaction({
+    hash: approveData?.hash,
   });
 
   const userUSDTBalance = (usdtBalance?.[0]?.result as bigint) || 0n;
@@ -326,15 +333,18 @@ export const ActionsCard = () => {
             className={classNames(
               "btn w-full md:max-w-[300px]",
               isApproved ? "btn-primary" : "btn-secondary",
-              prepDepositError ? "btn-disabled" : "",
-              depositLoading ? "btn-loading loading-ring" : ""
+              isApproved && prepDepositError ? "btn-disabled" : "",
+              depositLoading || approveLoading ? "btn-loading loading-ring" : ""
             )}
             onClick={() => {
-              isApproved ? deposit?.() : null;
+              isApproved ? deposit?.() : approve?.();
             }}
           >
             {isApproved ? "deposit" : "approve"}
           </button>
+          {depositAmount === 0 && (
+            <span className="text-sm text-error">Min Deposit: 5 USDT</span>
+          )}
         </div>
         <div className="flex flex-col items-center py-5">
           <p className="text-sm">DISCLAIMER PENDING!!!</p>
