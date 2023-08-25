@@ -4,10 +4,10 @@ import { NextPage } from "next";
 const Page: NextPage = () => {
   return (
     <main className="pt-[65px] bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 flex flex-col items-center">
-      <h1 className="text-black text-3xl font-bold py-5 uppercase">
+      <h1 className="text-black text-3xl font-bold py-5 md:py-10 uppercase">
         Investment
       </h1>
-      <section className="flex flex-col px-5 w-full items-center">
+      <section className="flex flex-col px-5 w-full items-center lg:flex-row lg:justify-between lg:items-start lg:px-10 pb-5">
         <StatsCard />
         <ActionsCard />
       </section>
