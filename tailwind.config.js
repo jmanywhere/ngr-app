@@ -9,6 +9,7 @@ module.exports = {
       {
         'mytheme': {                          //your theme name
           'primary': '#04BF55',                //primary color
+          'secondary': "#204FC0"
         }
       },
     ],

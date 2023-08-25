@@ -1,9 +1,8 @@
 import { Providers } from "./providers";
-import "../styles/globals.css";
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import { Arimo } from "next/font/google";
-import classNames from "classnames";
+import "@/styles/globals.css";
 const arimo = Arimo({
   subsets: ["latin"],
   weight: ["400", "700"],
