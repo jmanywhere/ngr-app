@@ -202,7 +202,7 @@ export const StatsCard = () => {
           </div>
         </div>
       </section>
-
+      <ActionsCard />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
