@@ -303,8 +303,9 @@ export const StatsCard = () => {
                     (positionInfo?.result as bigint[])?.[1] || 0n;
                   const liquidated =
                     (positionInfo?.result as bigint[])?.[7] > 0n;
+                  const early = (positionInfo?.result as bigint[])?.[7] === 1n;
                   return (
-                    <tr key={index}>
+                    <tr key={`${posId}-position`}>
                       <td className="text-center font-bold">
                         {posId.toLocaleString()}
                       </td>
@@ -325,8 +326,17 @@ export const StatsCard = () => {
                             ).toLocaleString()
                           : "Pending"}
                       </td>
-                      <td className="text-center">
-                        {liquidated ? (
+                      <td
+                        className={classNames(
+                          "text-center",
+                          early ? "text-error" : ""
+                        )}
+                      >
+                        {early ? (
+                          parseFloat(
+                            formatEther((depositAmount * 94n) / 100n)
+                          ).toLocaleString()
+                        ) : liquidated ? (
                           "-"
                         ) : (
                           <button className="btn btn-accent btn-xs">
