@@ -716,7 +716,37 @@ const abi = [
       "inputs":[
          
       ],
+      "name":"totalDeposits",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
       "name":"totalHelix",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"totalLiquidations",
       "outputs":[
          {
             "internalType":"uint256",

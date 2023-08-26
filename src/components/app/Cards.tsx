@@ -3,6 +3,7 @@
 import { Web3Button } from "@web3modal/react";
 import {
   erc20ABI,
+  paginatedIndexesConfig,
   useAccount,
   useContractInfiniteReads,
   useContractRead,
@@ -16,7 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0x887f34c78a491ADae112E3390Ed7b2f52074a2e7";
+const ngrContract = "0xb629f1C1ebB0e34064cCF0fff3b5C94c2De94972";
 
 const ngrConfig = {
   address: ngrContract,
@@ -65,6 +66,14 @@ export const StatsCard = () => {
         functionName: "userStats",
         args: [address || zeroAddress],
       },
+      {
+        ...ngrConfig,
+        functionName: "totalDeposits",
+      },
+      {
+        ...ngrConfig,
+        functionName: "totalLiquidations",
+      },
     ],
   });
   const [selectedPosition, setSelectedPosition] = useState(0);
@@ -79,7 +88,9 @@ export const StatsCard = () => {
       currentUserPendingLiquidation: (ngrData?.[5].result as bigint) || 0n,
       deposits: (ngrData?.[6].result as bigint) || 0n,
       totalUserPositions: (ngrData?.[7].result as bigint[]) || [],
-      userStats: (ngrData?.[8].result as bigint[]) || [],
+      userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
+      totalDeposits: (ngrData?.[9].result as bigint) || 0n,
+      totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
     };
   }, [ngrData]);
   console.log({ ...statsData });
@@ -92,23 +103,79 @@ export const StatsCard = () => {
   const { data: positionData, refetch: positionRefetch } = useContractRead({
     ...ngrConfig,
     functionName: "positions",
-    args: [positionSelected],
+    args: [statsData.userStats[6] || 0n],
   });
+
+  const {
+    data: positionsData,
+    fetchNextPage,
+    refetch: positionsRefetch,
+  } = useContractInfiniteReads({
+    cacheKey: "user_positions",
+    ...paginatedIndexesConfig(
+      (index: number) => {
+        if (index >= statsData.totalUserPositions.length)
+          return [] as readonly any[];
+        const positionToGet =
+          statsData.totalUserPositions[parseInt(index.toString())];
+        return [
+          {
+            ...ngrConfig,
+            functionName: "positions",
+            args: [positionToGet],
+          },
+        ];
+      },
+      { start: 0, perPage: 10, direction: "increment" }
+    ),
+  });
+
+  console.log({ positionsData });
 
   useEffect(() => {
     const interval = setInterval(() => {
       ngrDataRefetch();
       positionRefetch();
+      positionsRefetch();
     }, 10000);
     return () => clearInterval(interval);
-  }, [ngrDataRefetch, positionRefetch]);
+  }, [ngrDataRefetch, positionRefetch, positionsRefetch]);
 
   return (
     <>
-      <section className="flex flex-col">
-        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
+      <section className="flex flex-col gap-y-4">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Global Stats
         </h2>
+        <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
+          <div className="stat">
+            <p className="stat-title text-slate-400">Investments</p>
+            <p className="stat-value">
+              {parseFloat(
+                formatEther(statsData.totalDeposits)
+              ).toLocaleString()}
+            </p>
+            <p className="stat-desc text-slate-500">Total Made USDT</p>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-400">Payouts</p>
+            <p className="stat-value">
+              {parseFloat(
+                formatEther(statsData.totalLiquidations)
+              ).toLocaleString()}
+            </p>
+            <p className="stat-desc text-slate-500">
+              Total Principal + Interest USDT
+            </p>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-400">Liquidations</p>
+            <p className="stat-value">
+              {statsData.liquidations.toLocaleString()}
+            </p>
+            <p className="stat-desc text-slate-500">Total Liquidations Made</p>
+          </div>
+        </div>
         <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
           <div className="stat">
             <p className="stat-title text-slate-400">Helix Price</p>
@@ -135,223 +202,146 @@ export const StatsCard = () => {
           </div>
         </div>
       </section>
-      <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
-        <div className="stat">
-          <p className="stat-title text-slate-400">Next Pos.</p>
-          <p className="stat-value">
-            {statsData.currentUserPendingLiquidation.toLocaleString()}
-          </p>
-          <p className="stat-desc text-slate-500">Liquidated</p>
-        </div>
-        <div className="stat">
-          <p className="stat-title text-slate-400">Liquidated</p>
-          <p className="stat-value">
-            {statsData.liquidations.toLocaleString()}
-          </p>
-          <p className="stat-desc text-slate-500">Total Positions Liquidates</p>
-        </div>
-        <div className="stat">
-          <p className="stat-title text-slate-400">Deposits</p>
-          <p className="stat-value">
-            {(
-              statsData.totalPositions - statsData.liquidations
-            ).toLocaleString()}
-          </p>
-          <p className="stat-desc text-slate-500">Active Deposits</p>
-        </div>
-      </div>
-      <section className="flex flex-col">
-        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
+
+      <section className="flex flex-col gap-4">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
         </h2>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
+        <div className="stats stats-vertical md:stats-horizontal shadow text-slate-100 bg-emerald-900 ">
           <div className="stat">
-            <p className="stat-title text-slate-300">Total</p>
+            <p className="stat-title text-slate-300">Deposited</p>
             <p className="stat-value">
-              {statsData.userStats[3].toLocaleString()}
+              {parseFloat(formatEther(statsData.userStats[0])).toLocaleString()}
             </p>
-            <div className="stat-desc text-slate-400">Total deposits</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Active</p>
-            <p className="stat-value">
-              {(
-                statsData.userStats[3] -
-                statsData.userStats[4] -
-                statsData.userStats[5]
-              ).toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Deposits Pending</div>
+            <div className="stat-desc text-slate-400">USDT</div>
           </div>
           <div className="stat">
             <p className="stat-title text-slate-300">Liquidations</p>
             <p className="stat-value">
-              {statsData.userStats[4].toLocaleString()}
+              {parseFloat(formatEther(statsData.userStats[1])).toLocaleString()}
             </p>
-            <div className="stat-desc text-slate-400">Total Liquidations</div>
+            <div className="stat-desc text-slate-400">USDT</div>
           </div>
           <div className="stat">
-            <p className="stat-title text-slate-300">Last</p>
+            <p className="stat-title text-slate-300">Last Liq.</p>
             <p className="stat-value">
-              {statsData.userStats[4].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">
-              Position Id Liquidated
-            </div>
-          </div>
-        </div>
-      </section>
-      <div className="stats stats-vertical md:stats-horizontal shadow text-slate-100 bg-emerald-900 ">
-        <div className="stat">
-          <p className="stat-title text-slate-300">Deposited</p>
-          <p className="stat-value">
-            {parseFloat(formatEther(statsData.userStats[0])).toLocaleString()}
-          </p>
-          <div className="stat-desc text-slate-400">USDT</div>
-        </div>
-        <div className="stat">
-          <p className="stat-title text-slate-300">Liquidations</p>
-          <p className="stat-value">
-            {parseFloat(formatEther(statsData.userStats[4])).toLocaleString()}
-          </p>
-          <div className="stat-desc text-slate-400">USDT</div>
-        </div>
-        <div className="stat">
-          <p className="stat-title text-slate-300">Last</p>
-          <p className="stat-value">
-            {statsData.userStats[6].toLocaleString()}
-          </p>
-          <div className="stat-desc text-slate-400">Position Id Liquidated</div>
-        </div>
-      </div>
-      <section className="flex flex-col">
-        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary">
-          Your Positions
-        </h2>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
-          <div className="stat">
-            <p className="stat-title text-slate-300">Total</p>
-            <p className="stat-value">
-              {statsData.userStats[3].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Total deposits</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Active</p>
-            <p className="stat-value">
-              {(
-                statsData.userStats[3] -
-                statsData.userStats[4] -
-                statsData.userStats[5]
-              ).toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Deposits Pending</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Liquidations</p>
-            <p className="stat-value">
-              {statsData.userStats[4].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Total Liquidations</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Last</p>
-            <p className="stat-value">
-              {statsData.userStats[4].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">
-              Position Id Liquidated
-            </div>
-          </div>
-        </div>
-      </section>
-      <div className="text-black p-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-6 md:mb-7 max-w-sm lg:max-w-md md:max-w-[600px]  w-full">
-        <div className="relative w-full flex flex-col items-center">
-          <h2 className="font-bold text-2xl py-1 w-full text-center pb-3 uppercase">
-            Stats
-          </h2>
-          <div className="lg:absolute right-0 top-0 pb-3">
-            <Web3Button />
-          </div>
-        </div>
-        {/* <div className="w-full px-6 pb-4 mb-4">
-        <div className="flex justify-between">
-          <p className="font-bold">Enough TCV</p>
-          <p className="uppercase">
-            {statsData.tcv > parseEther("5000") ? "true" : "false"}
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <p className="font-bold">Gaps OK</p>
-          <p className="uppercase">
-            {statsData.deposits - statsData.liquidations > 20}
-          </p>
-        </div>
-      </div> */}
-        <div className="pb-5 w-full px-6 border-t-4 pt-4 border-secondary">
-          <h3 className="text-xl font-bold">Your Stats</h3>
-          <div className="flex justify-between">
-            <p className="font-bold">Positions:</p>
-            <p>{statsData.totalUserPositions.length.toLocaleString()}</p>
-          </div>
-          <div className="flex flex-row items-center justify-center pt-2 gap-x-2">
-            <button
-              onClick={() => setSelectedPosition((p) => (p == 0 ? 0 : p - 1))}
-              className={classNames(
-                "btn btn-circle btn-outline btn-sm btn-secondary",
-                selectedPosition == 0 ? "btn-disabled" : ""
-              )}
-            >
-              {"<"}
-            </button>
-            <p className="px-3">
-              Position: {positionSelected.toLocaleString()}
-            </p>
-            <button
-              onClick={() =>
-                setSelectedPosition((p) => {
-                  if (statsData.totalUserPositions.length === 0) return 0;
-                  else
-                    return p === statsData.totalUserPositions.length - 1
-                      ? p
-                      : p + 1;
-                })
-              }
-              className={classNames(
-                "btn btn-circle btn-secondary btn-outline btn-sm",
-                statsData.totalUserPositions.length == 0 ||
-                  selectedPosition == statsData.totalUserPositions.length - 1
-                  ? "btn-disabled"
-                  : ""
-              )}
-            >
-              {">"}
-            </button>
-          </div>
-        </div>
-        <div className="border-[#333] border-4 rounded-lg w-full py-3 px-6">
-          <div className="flex justify-between pb-1">
-            <p className="font-bold">Deposit Amount:</p>
-            <p>
-              {parseFloat(
-                formatEther(positionData?.[1] || 0n)
-              ).toLocaleString()}
-            </p>
-          </div>
-          <div className="flex justify-between pb-1">
-            <p className="font-bold">Liquidation Amount:</p>
-            <p>
               {parseFloat(
                 formatEther(((positionData?.[1] || 0n) * 106n) / 100n)
               ).toLocaleString()}
             </p>
-          </div>
-          <div className="flex justify-between pb-1">
-            <p className="font-bold">Is Liquidated:</p>
-            <p>{positionData?.[7] ? "TRUE" : "FALSE"}</p>
+            <div className="stat-desc text-slate-400">USDT</div>
           </div>
         </div>
-      </div>
+        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
+          <div className="stat">
+            <p className="stat-title text-slate-300">Total</p>
+            <p className="stat-value">
+              {statsData.userStats[3].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total deposits</div>
+          </div>
+          {/* <div className="stat">
+            <p className="stat-title text-slate-300">Active</p>
+            <p className="stat-value">
+              {(
+                statsData.userStats[3] -
+                statsData.userStats[4] -
+                statsData.userStats[5]
+              ).toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Deposits Pending</div>
+          </div> */}
+          <div className="stat">
+            <p className="stat-title text-slate-300">Liquidations</p>
+            <p className="stat-value">
+              {statsData.userStats[4].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Total Liquidations</div>
+          </div>
+          <div className="stat">
+            <p className="stat-title text-slate-300">Last ID</p>
+            <p className="stat-value">
+              {statsData.userStats[6].toLocaleString()}
+            </p>
+            <div className="stat-desc text-slate-400">Position Liquidated</div>
+          </div>
+        </div>
+      </section>
+      <section className="flex flex-col">
+        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
+          Positions
+        </h2>
+        <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
+          <table className="table table-zebra">
+            <thead>
+              <th>Position ID</th>
+              <th>Deposit</th>
+              <th>Liquidation</th>
+              <th></th>
+            </thead>
+            <tbody>
+              {positionsData?.pages?.map((pagePositions, index) => {
+                if (pagePositions.length == 0)
+                  return (
+                    <tr>
+                      <td className="text-center" colSpan={4}>
+                        No positions
+                      </td>
+                    </tr>
+                  );
+                return pagePositions?.map((positionInfo, positionIndex) => {
+                  if (statsData.totalUserPositions.length == 0)
+                    return (
+                      <tr>
+                        <td className="text-center" colSpan={4}>
+                          No positions
+                        </td>
+                      </tr>
+                    );
+                  const posId = statsData.totalUserPositions[positionIndex];
+                  const depositAmount =
+                    (positionInfo?.result as bigint[])?.[1] || 0n;
+                  const liquidated =
+                    (positionInfo?.result as bigint[])?.[7] > 0n;
+                  return (
+                    <tr key={index}>
+                      <td className="text-center font-bold">
+                        {posId.toLocaleString()}
+                      </td>
+                      <td className="text-right">
+                        {parseFloat(
+                          formatEther(depositAmount)
+                        ).toLocaleString()}
+                      </td>
+                      <td
+                        className={classNames(
+                          "text-right",
+                          liquidated ? "" : "text-primary text-xs"
+                        )}
+                      >
+                        {liquidated
+                          ? parseFloat(
+                              formatEther((depositAmount * 106n) / 100n)
+                            ).toLocaleString()
+                          : "Pending"}
+                      </td>
+                      <td className="text-center">
+                        {liquidated ? (
+                          "-"
+                        ) : (
+                          <button className="btn btn-accent btn-xs">
+                            exit
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                });
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </>
   );
 };
@@ -420,8 +410,7 @@ export const ActionsCard = () => {
 
   return (
     <>
-      <div className="text-black pt-7 pb-4 px-4 rounded-lg border-4 border-black flex flex-col items-center bg-slate-300/80 mb-4 md:max-w-[600px] lg:max-w-[300px] w-full">
-        <h2 className="font-bold text-2xl pb-4">Actions</h2>
+      <div className="text-white/90 p-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
         <div className="py-3 w-full flex flex-col items-center">
           <div className="join">
             <div className="form-control w-full join-item">
@@ -437,10 +426,10 @@ export const ActionsCard = () => {
                 onFocus={(e) => e.target.select()}
               />
               <label className="label">
-                <span className="label-text-alt text-black font-semibold">
+                <span className="label-text-alt  font-semibold">
                   Wallet USDT
                 </span>
-                <span className="label-text-alt text-black">
+                <span className="label-text-alt ">
                   {parseFloat(formatEther(userUSDTBalance)).toLocaleString()}
                 </span>
               </label>
