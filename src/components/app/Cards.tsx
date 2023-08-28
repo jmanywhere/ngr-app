@@ -13,11 +13,11 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import NgrAbi from "@/abi/NGR";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0xb629f1C1ebB0e34064cCF0fff3b5C94c2De94972";
+const ngrContract = "0x51DcC3c552fDddB9EF8c9F6e64fDF611Ee49fdf5";
 
 const ngrConfig = {
   address: ngrContract,
@@ -76,7 +76,6 @@ export const StatsCard = () => {
       },
     ],
   });
-  const [selectedPosition, setSelectedPosition] = useState(0);
 
   const statsData = useMemo(() => {
     return {
@@ -95,23 +94,21 @@ export const StatsCard = () => {
   }, [ngrData]);
   console.log({ ...statsData });
 
-  const positionSelected =
-    statsData.totalUserPositions.length > 0
-      ? statsData.totalUserPositions[selectedPosition]
-      : 0n;
-
   const { data: positionData, refetch: positionRefetch } = useContractRead({
     ...ngrConfig,
     functionName: "positions",
     args: [statsData.userStats[6] || 0n],
   });
 
+  const [selectedPage, setSelectedPage] = useState(0);
+
   const {
     data: positionsData,
     fetchNextPage,
     refetch: positionsRefetch,
+    isLoading: positionsLoading,
   } = useContractInfiniteReads({
-    cacheKey: "user_positions",
+    cacheKey: "user_positions_1",
     ...paginatedIndexesConfig(
       (index: number) => {
         if (index >= statsData.totalUserPositions.length)
@@ -126,20 +123,29 @@ export const StatsCard = () => {
           },
         ];
       },
-      { start: 0, perPage: 10, direction: "increment" }
+      {
+        start: statsData.totalUserPositions.length - 1,
+        perPage: 10,
+        direction: "decrement",
+      }
     ),
   });
 
-  console.log({ positionsData });
+  const fullRefetch = useCallback(() => {
+    ngrDataRefetch();
+    positionRefetch();
+    positionsRefetch();
+  }, [ngrDataRefetch, positionRefetch, positionsRefetch]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      ngrDataRefetch();
-      positionRefetch();
-      positionsRefetch();
+      fullRefetch();
     }, 10000);
     return () => clearInterval(interval);
-  }, [ngrDataRefetch, positionRefetch, positionsRefetch]);
+  }, [fullRefetch]);
+
+  console.log({ positionsData });
+  const totalPages = Math.ceil(statsData.totalUserPositions.length / 10);
 
   return (
     <>
@@ -202,7 +208,7 @@ export const StatsCard = () => {
           </div>
         </div>
       </section>
-      <ActionsCard />
+      <ActionsCard refetchOther={fullRefetch} />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
@@ -274,23 +280,18 @@ export const StatsCard = () => {
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
             <thead>
-              <th>Position ID</th>
-              <th>Deposit</th>
-              <th>Liquidation</th>
-              <th></th>
+              <tr>
+                <th>Position ID</th>
+                <th>Deposit</th>
+                <th>Liquidation</th>
+                <th></th>
+              </tr>
             </thead>
             <tbody>
-              {positionsData?.pages?.map((pagePositions, index) => {
-                if (pagePositions.length == 0)
-                  return (
-                    <tr>
-                      <td className="text-center" colSpan={4}>
-                        No positions
-                      </td>
-                    </tr>
-                  );
-                return pagePositions?.map((positionInfo, positionIndex) => {
-                  if (statsData.totalUserPositions.length == 0)
+              {positionsData?.pages?.[selectedPage]?.map(
+                (positionInfo, positionIndex) => {
+                  const totalLength = statsData.totalUserPositions.length;
+                  if (totalLength == 0)
                     return (
                       <tr>
                         <td className="text-center" colSpan={4}>
@@ -298,68 +299,156 @@ export const StatsCard = () => {
                         </td>
                       </tr>
                     );
-                  const posId = statsData.totalUserPositions[positionIndex];
+                  const posId =
+                    statsData.totalUserPositions[
+                      totalLength - 1 - positionIndex - selectedPage * 10
+                    ];
+                  const posIndex =
+                    totalLength - 1 - positionIndex - selectedPage * 10;
                   const depositAmount =
                     (positionInfo?.result as bigint[])?.[1] || 0n;
                   const liquidated =
                     (positionInfo?.result as bigint[])?.[7] > 0n;
                   const early = (positionInfo?.result as bigint[])?.[7] === 1n;
+                  // console.log({ early, res: positionInfo.result });
                   return (
-                    <tr key={`${posId}-position`}>
-                      <td className="text-center font-bold">
-                        {posId.toLocaleString()}
-                      </td>
-                      <td className="text-right">
-                        {parseFloat(
-                          formatEther(depositAmount)
-                        ).toLocaleString()}
-                      </td>
-                      <td
-                        className={classNames(
-                          "text-right",
-                          liquidated ? "" : "text-primary text-xs"
-                        )}
-                      >
-                        {liquidated
-                          ? parseFloat(
-                              formatEther((depositAmount * 106n) / 100n)
-                            ).toLocaleString()
-                          : "Pending"}
-                      </td>
-                      <td
-                        className={classNames(
-                          "text-center",
-                          early ? "text-error" : ""
-                        )}
-                      >
-                        {early ? (
-                          parseFloat(
-                            formatEther((depositAmount * 94n) / 100n)
-                          ).toLocaleString()
-                        ) : liquidated ? (
-                          "-"
-                        ) : (
-                          <button className="btn btn-accent btn-xs">
-                            exit
-                          </button>
-                        )}
-                      </td>
-                    </tr>
+                    <PositionRow
+                      key={`position-${posId}-page-${selectedPage}`}
+                      positionId={posId}
+                      positionIndex={posIndex}
+                      depositAmount={depositAmount}
+                      isEarlyWithdraw={early}
+                      isLiquidated={liquidated}
+                    />
                   );
-                });
-              })}
+                }
+              )}
             </tbody>
           </table>
+          {statsData.totalUserPositions.length > 10 && (
+            <div className="flex flex-row items-center justify-between">
+              <button
+                className={classNames(
+                  "btn  btn-circle btn-secondary",
+                  selectedPage === totalPages - 1 ? "btn-disabled" : ""
+                )}
+                onClick={() => {
+                  if (
+                    selectedPage + 1 >
+                    (positionsData?.pages?.length || 0) - 1
+                  ) {
+                    console.log("here");
+                    fetchNextPage();
+                  }
+                  setSelectedPage((p) => p + 1);
+                }}
+              >
+                {"<"}
+              </button>
+              <div className="font-semibold">
+                {positionsLoading ? (
+                  <span className="loading loading-spinner text-white w-10 h-10" />
+                ) : (
+                  Math.ceil(statsData.totalUserPositions.length / 10) -
+                  selectedPage
+                )}{" "}
+                / {Math.ceil(statsData.totalUserPositions.length / 10)}
+              </div>
+              <button
+                className={classNames(
+                  "btn  btn-circle btn-secondary",
+                  selectedPage === 0 ? "btn-disabled" : ""
+                )}
+                onClick={() => setSelectedPage((p) => p - 1)}
+              >
+                {">"}
+              </button>
+            </div>
+          )}
         </div>
       </section>
     </>
   );
 };
 
+const PositionRow = (props: {
+  positionId: bigint;
+  positionIndex: number;
+  depositAmount: bigint;
+  isLiquidated: boolean;
+  isEarlyWithdraw: boolean;
+}) => {
+  const {
+    positionId: posId,
+    positionIndex,
+    depositAmount,
+    isLiquidated,
+    isEarlyWithdraw,
+  } = props;
+
+  const { config: prepExitConfig, error: prepExitError } =
+    usePrepareContractWrite({
+      ...ngrConfig,
+      functionName: "earlyWithdraw",
+      args: [BigInt(positionIndex)],
+      enabled: !isLiquidated,
+    });
+
+  const { write: exit, data: exitData } = useContractWrite(
+    prepExitConfig || null
+  );
+  const { isLoading: exitLoading } = useWaitForTransaction({
+    hash: exitData?.hash,
+  });
+
+  return (
+    <tr>
+      <td className="text-center font-bold">{posId.toLocaleString()}</td>
+      <td className="text-right">
+        {parseFloat(formatEther(depositAmount)).toLocaleString()}
+      </td>
+      <td
+        className={classNames(
+          "text-right",
+          isEarlyWithdraw ? "text-error" : "",
+          isEarlyWithdraw || isLiquidated ? "" : "text-primary text-xs"
+        )}
+      >
+        {isEarlyWithdraw
+          ? parseFloat(
+              formatEther((depositAmount * 94n) / 100n)
+            ).toLocaleString()
+          : isLiquidated
+          ? parseFloat(
+              formatEther((depositAmount * 106n) / 100n)
+            ).toLocaleString()
+          : "Pending"}
+      </td>
+      <td className={classNames("text-center")}>
+        {isLiquidated ? (
+          "-"
+        ) : (
+          <button
+            className={classNames(
+              "btn btn-accent btn-xs",
+              exitLoading ? "loading loading-spinner" : ""
+            )}
+            onClick={exit}
+            disabled={exitLoading}
+          >
+            exit
+          </button>
+        )}
+      </td>
+    </tr>
+  );
+};
+
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
-export const ActionsCard = () => {
+export const ActionsCard = (props: { refetchOther: () => void }) => {
+  const { refetchOther } = props;
   const { address } = useAccount();
   const { data: usdtBalance, refetch: usdtRefetch } = useContractReads({
     contracts: [
@@ -374,6 +463,10 @@ export const ActionsCard = () => {
         abi: erc20ABI,
         functionName: "allowance",
         args: [address || zeroAddress, ngrContract],
+      },
+      {
+        ...ngrConfig,
+        functionName: "canLiquidate",
       },
     ],
   });
@@ -393,6 +486,11 @@ export const ActionsCard = () => {
       functionName: "deposit",
       args: [parseEther(`${depositAmount}`)],
     });
+  const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
+    ...ngrConfig,
+    functionName: "performUpkeep",
+    args: [`0x${"0000"}`],
+  });
 
   const { write: deposit, data: depositData } = useContractWrite(
     depositConfig || null
@@ -400,11 +498,17 @@ export const ActionsCard = () => {
   const { write: approve, data: approveData } = useContractWrite(
     prepApproveConfig || null
   );
+  const { write: upkeep, data: upkeepData } = useContractWrite(
+    upkeepConfig || null
+  );
   const { isLoading: depositLoading } = useWaitForTransaction({
     hash: depositData?.hash,
   });
   const { isLoading: approveLoading } = useWaitForTransaction({
     hash: approveData?.hash,
+  });
+  const { isLoading: upkeepLoading } = useWaitForTransaction({
+    hash: upkeepData?.hash,
   });
 
   const userUSDTBalance = (usdtBalance?.[0]?.result as bigint) || 0n;
@@ -420,7 +524,7 @@ export const ActionsCard = () => {
 
   return (
     <>
-      <div className="text-white/90 p-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
+      <div className="text-white/90 px-4 pt-4 pb-2 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
         <div className="py-3 w-full flex flex-col items-center">
           <div className="join">
             <div className="form-control w-full join-item">
@@ -460,8 +564,13 @@ export const ActionsCard = () => {
               Max
             </button>
           </div>
-          {(depositAmount === 0 && isApproved && (
-            <span className="text-sm text-error">Min Deposit: 5 USDT</span>
+          {((depositAmount < 5 || (depositAmount > 1000 && isApproved)) && (
+            <>
+              <span className="text-sm text-error">Min Deposit: 5 USDT</span>
+              <span className="text-sm text-error">
+                Max Deposit: 1,000 USDT
+              </span>
+            </>
           )) ||
             null}
           <button
@@ -478,9 +587,25 @@ export const ActionsCard = () => {
             {isApproved ? "deposit" : "approve"}
           </button>
         </div>
-        <div className="flex flex-col items-center py-5">
-          <p className="text-sm">DISCLAIMER PENDING!!!</p>
+        <div className="flex flex-col items-center justify-center py-5 max-w-xs">
+          <p className="text-xs whitespace-pre-line text-justify text-slate-400">
+            Deposits are automatically liquidated (principal and interest) when
+            the 6% profit target is met.{"\n"}Exiting before this automatic
+            liquidation incurs a 6% penalty.
+          </p>
         </div>
+        <button
+          className={classNames(
+            "btn w-full md:max-w-[300px] btn-accent",
+            upkeepError ? "btn-disabled" : "",
+            upkeepLoading ? "btn-loading loading-ring" : ""
+          )}
+          onClick={() => {
+            upkeep?.();
+          }}
+        >
+          Upkeep
+        </button>
       </div>
     </>
   );
