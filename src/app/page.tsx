@@ -88,9 +88,11 @@ const Page: NextPage = () => {
         <p className="text-center px-5 text-xs text-black font-medium lg:max-w-[1024px]">
           NGR provides investors repeated returns of 6%. Each investment can
           take a few weeks, a few days…or even a few hours. This equates to an
-          APY conservatively of approximately 134%. NGR allows for
-          auto-reinvestment of proceeds by simply checking a box in the dApp.
-          Maximize APY by taking advantage of this feature. <br />
+          APY conservatively of approximately 134%. Profited liquidations can
+          occur VERY QUICKLY, so be sure to check your investments several times
+          per day. By reinvesting proceeds as soon as possible after
+          liquidation, compounded returns will be accelerated.
+          <br />
           <br /> NGR utilizes the fair and equitable FIFO (First In First Out)
           system for automatically liquidating investors. <br />
           <br /> Max risk is 6%. The only way to lose 6% is if an investor exits
