@@ -11,18 +11,50 @@ const Page: NextPage = () => {
       <h1 className="text-[#012970] text-3xl font-bold py-5 md:py-10 center">
         Frequently Asked Questions
       </h1>
-      <Image src={logo} alt="NextGen Logo" className="h-[150] py-5 lg:mr-10" />
-      <section className="text-white/90 px-4 pt-4 pb-2 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 w-full">
-        <h2 className="text-2xl text-primary font-bold">Common Acronyms:</h2>
+      <section className="text-white/90 px-4 pt-4 pb-6 rounded-lg border-2 border-black flex flex-col md:flex-row md:justify-center md:gap-8 items-center bg-slate-800/80 mb-4 w-full md:max-w-[600px]">
+        <Image
+          src={logo}
+          alt="NextGen Logo"
+          width={100}
+          height={100}
+          className=" py-5 lg:mr-10"
+        />
         <div className="pl-3">
-          <p>NGR - NextGenROI</p>
-          <p>TCV - Total Contract Value </p>
-          <p>PTR - Price-Tax Ratio </p>
-          <p>VBT - Virtual Burn Technology </p>
-          <p>CR - Corporate Restructure </p>
-          <p>IC - Investment Cycle </p>
-          <p>LE - Liquidation Event </p>
-          <p>LQ - Liquidation Queue </p>
+          <h2 className="text-2xl text-primary font-bold">Common Acronyms:</h2>
+          <ul>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">NGR</div>
+              NextGenROI
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">TCV</div>Total
+              Contract Value{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">PTR</div>
+              Price-Tax Ratio{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">VBT</div>
+              Virtual Burn Technology{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">CR </div>
+              Corporate Restructure{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">IC </div>
+              Investment Cycle{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">LE </div>
+              Liquidation Event{" "}
+            </li>
+            <li>
+              <div className="mr-2 inline-block  w-12 font-bold">LQ </div>
+              Liquidation Queue{" "}
+            </li>
+          </ul>
         </div>
       </section>
       <section className=" pb-5">
