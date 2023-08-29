@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0x51DcC3c552fDddB9EF8c9F6e64fDF611Ee49fdf5";
+const ngrContract = "0xA5F565b15e158192A13ea621D869A2Fa258234B2";
 
 const ngrConfig = {
   address: ngrContract,
@@ -319,6 +319,7 @@ export const StatsCard = () => {
                       depositAmount={depositAmount}
                       isEarlyWithdraw={early}
                       isLiquidated={liquidated}
+                      isLast={posId === statsData.totalUserPositions[-1]}
                     />
                   );
                 }
@@ -377,6 +378,7 @@ const PositionRow = (props: {
   depositAmount: bigint;
   isLiquidated: boolean;
   isEarlyWithdraw: boolean;
+  isLast: boolean;
 }) => {
   const {
     positionId: posId,
@@ -384,6 +386,7 @@ const PositionRow = (props: {
     depositAmount,
     isLiquidated,
     isEarlyWithdraw,
+    isLast,
   } = props;
 
   const { config: prepExitConfig, error: prepExitError } =
@@ -399,6 +402,7 @@ const PositionRow = (props: {
   );
   const { isLoading: exitLoading } = useWaitForTransaction({
     hash: exitData?.hash,
+    confirmations: 15,
   });
 
   return (
@@ -425,7 +429,7 @@ const PositionRow = (props: {
           : "Pending"}
       </td>
       <td className={classNames("text-center")}>
-        {isLiquidated ? (
+        {isLiquidated && !isLast ? (
           "-"
         ) : (
           <button
@@ -478,6 +482,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     abi: erc20ABI,
     functionName: "approve",
     args: [ngrContract, parseEther(`${1_000_000}`)],
+    onSuccess: refetchOther,
   });
 
   const { config: depositConfig, error: prepDepositError } =
@@ -485,11 +490,13 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
       ...ngrConfig,
       functionName: "deposit",
       args: [parseEther(`${depositAmount}`)],
+      onSuccess: refetchOther,
     });
   const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
     ...ngrConfig,
     functionName: "performUpkeep",
     args: [`0x${"0000"}`],
+    onSuccess: refetchOther,
   });
 
   const { write: deposit, data: depositData } = useContractWrite(
@@ -503,12 +510,15 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
   );
   const { isLoading: depositLoading } = useWaitForTransaction({
     hash: depositData?.hash,
+    confirmations: 5,
   });
   const { isLoading: approveLoading } = useWaitForTransaction({
     hash: approveData?.hash,
+    confirmations: 5,
   });
   const { isLoading: upkeepLoading } = useWaitForTransaction({
     hash: upkeepData?.hash,
+    confirmations: 5,
   });
 
   const userUSDTBalance = (usdtBalance?.[0]?.result as bigint) || 0n;
@@ -564,12 +574,10 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
               Max
             </button>
           </div>
-          {((depositAmount < 5 || (depositAmount > 1000 && isApproved)) && (
+          {((depositAmount < 100 || (depositAmount > 500 && isApproved)) && (
             <>
-              <span className="text-sm text-error">Min Deposit: 5 USDT</span>
-              <span className="text-sm text-error">
-                Max Deposit: 1,000 USDT
-              </span>
+              <span className="text-sm text-error">Min Deposit: 100 USDT</span>
+              <span className="text-sm text-error">Max Deposit: 500 USDT</span>
             </>
           )) ||
             null}
