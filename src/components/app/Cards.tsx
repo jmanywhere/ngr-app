@@ -429,7 +429,7 @@ const PositionRow = (props: {
           : "Pending"}
       </td>
       <td className={classNames("text-center")}>
-        {isLiquidated && !isLast ? (
+        {(isLiquidated && !isLast) || Boolean(prepExitError) ? (
           "-"
         ) : (
           <button
