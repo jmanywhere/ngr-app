@@ -1,5 +1,6 @@
 import Image from "next/image";
 import logo from "../../../public/images/Logo_1.png";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -14,14 +15,14 @@ const Footer = () => {
           <div className="flex flex-col items-center text-white pb-4">
             <h3 className="font-bold pb-3">GO TO</h3>
             <nav className="flex flex-col items-center text-white">
-              <a href="#FAQ" className="text-sm py-2">
+              <Link href="/faqs" className="text-sm py-2">
                 FAQ
-              </a>
-              <a href="#Lottery" className="text-sm py-2">
-                Lotery
-              </a>
-              <a href="#TradingBot" className="text-sm py-2">
-                Trading Bot
+              </Link>
+              <a
+                href="#Lottery"
+                className="text-sm py-2 disabled text-gray-700"
+              >
+                Lottery
               </a>
               <a href="#Audit" className="text-sm py-2">
                 Audit
@@ -31,12 +32,12 @@ const Footer = () => {
           <div className="flex flex-col items-center text-white">
             <h3 className="font-bold pb-3">Socials</h3>
             <nav className="flex flex-col items-center text-white">
-              <a href="#Twiter" className="text-sm py-2">
+              {/* <a href="#Twiter" className="text-sm py-2">
                 Twiter
               </a>
               <a href="#Discord" className="text-sm py-2">
                 Discord
-              </a>
+              </a> */}
               <a
                 href="https://t.me/nextgenroi"
                 rel="noopenner"
