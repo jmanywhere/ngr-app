@@ -11,7 +11,6 @@ const Header = () => {
         <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
       </Link>
       <div className="flex flex-row items-center">
-        <MenuButton />
         <nav className="hidden text-sm lg:flex px-3 flex-row items-center gap-3">
           <a
             href="#FAQ"
@@ -47,6 +46,7 @@ const Header = () => {
         <div className="hidden md:block">
           <Web3HeaderBtn />
         </div>
+        <MenuButton />
       </div>
     </header>
   );

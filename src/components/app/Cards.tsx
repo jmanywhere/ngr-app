@@ -310,7 +310,6 @@ export const StatsCard = () => {
                   const liquidated =
                     (positionInfo?.result as bigint[])?.[7] > 0n;
                   const early = (positionInfo?.result as bigint[])?.[7] === 1n;
-                  // console.log({ early, res: positionInfo.result });
                   return (
                     <PositionRow
                       key={`position-${posId}-page-${selectedPage}`}
@@ -319,7 +318,9 @@ export const StatsCard = () => {
                       depositAmount={depositAmount}
                       isEarlyWithdraw={early}
                       isLiquidated={liquidated}
-                      isLast={posId === statsData.totalUserPositions[-1]}
+                      isLast={
+                        posId === statsData.totalUserPositions[totalLength - 1]
+                      }
                     />
                   );
                 }
@@ -393,7 +394,6 @@ const PositionRow = (props: {
     usePrepareContractWrite({
       ...ngrConfig,
       functionName: "earlyWithdraw",
-      args: [BigInt(positionIndex)],
       enabled: !isLiquidated,
     });
 
