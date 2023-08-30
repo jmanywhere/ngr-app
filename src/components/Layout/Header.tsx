@@ -19,7 +19,7 @@ const Header = () => {
             FAQs
           </Link>
           {/* <a href="#Lottery" className="btn btn-link no-underline font-light capitalize text-black px-3">
-          Lotery
+          Lottery
         </a>
         <a href="#TradingBot" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Trading Bot
