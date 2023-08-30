@@ -277,6 +277,9 @@ export const StatsCard = () => {
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Positions
         </h2>
+        <h3 className="w-full font-bold text-lg drop-shadow text-secondary text-center">
+          Next to Liquidate: {statsData.liquidations.toLocaleString()}
+        </h3>
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
             <thead>
