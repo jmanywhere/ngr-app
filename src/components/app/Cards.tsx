@@ -566,8 +566,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
             <button
               className="btn btn-primary rounded-l-none"
               onClick={() => {
-                if (userUSDTBalance > parseEther("1000"))
-                  setDepositAmount(1000);
+                if (userUSDTBalance > parseEther("500")) setDepositAmount(500);
                 else setDepositAmount(parseFloat(formatEther(userUSDTBalance)));
               }}
             >
