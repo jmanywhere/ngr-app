@@ -74,6 +74,10 @@ export const StatsCard = () => {
         ...ngrConfig,
         functionName: "totalLiquidations",
       },
+      {
+        ...ngrConfig,
+        functionName: "currentUserPendingLiquidation",
+      },
     ],
   });
 
@@ -90,6 +94,7 @@ export const StatsCard = () => {
       userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
       totalDeposits: (ngrData?.[9].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
+      pendingLiquidation: (ngrData?.[11].result as bigint) || 0n,
     };
   }, [ngrData]);
   console.log({ ...statsData });
@@ -278,7 +283,7 @@ export const StatsCard = () => {
           Positions
         </h2>
         <h3 className="w-full font-bold text-lg drop-shadow text-secondary text-center">
-          Next to Liquidate: {statsData.liquidations.toLocaleString()}
+          Next to Liquidate: {statsData.pendingLiquidation.toLocaleString()}
         </h3>
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
