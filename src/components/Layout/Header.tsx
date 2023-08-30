@@ -12,12 +12,12 @@ const Header = () => {
       </Link>
       <div className="flex flex-row items-center">
         <nav className="hidden text-sm lg:flex px-3 flex-row items-center gap-3">
-          <a
-            href="#FAQ"
+          <Link
+            href="/faqs"
             className="btn btn-link no-underline font-light capitalize text-black px-3"
           >
             FAQs
-          </a>
+          </Link>
           {/* <a href="#Lottery" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Lotery
         </a>
