@@ -410,7 +410,9 @@ const PositionRow = (props: {
 
   return (
     <tr>
-      <td className="text-center font-bold">{posId.toLocaleString()}</td>
+      <td className="text-center font-bold">
+        {posId?.toLocaleString() || "-"}
+      </td>
       <td className="text-right">
         {parseFloat(formatEther(depositAmount)).toLocaleString()}
       </td>
@@ -432,7 +434,7 @@ const PositionRow = (props: {
           : "Pending"}
       </td>
       <td className={classNames("text-center")}>
-        {(isLiquidated && !isLast) || Boolean(prepExitError) ? (
+        {isLiquidated || !isLast || Boolean(prepExitError) ? (
           "-"
         ) : (
           <button
