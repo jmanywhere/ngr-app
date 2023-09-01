@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0x53AC234d429de04c810dc43A8D475E2EA27Eb259";
+const ngrContract = "0x9e8771c85bF7118c4982b2d1b9392e4084246B5B";
 
 const ngrConfig = {
   address: ngrContract,
