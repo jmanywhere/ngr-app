@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
-const ngrContract = "0xC2093B1C7cfDd4208d7Dc035C858C21D924161be";
+const ngrContract = "0xBdE6E7C799E5983C63bb863B0D0c67EC4947A9Cd";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
