@@ -16,6 +16,8 @@ import NgrAbi from "@/abi/NGR2";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
+import intervalToDuration from "date-fns/intervalToDuration";
+import formatDuration from "date-fns/formatDuration";
 
 const ngrContract = "0xBdE6E7C799E5983C63bb863B0D0c67EC4947A9Cd";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
@@ -319,27 +321,51 @@ export const StatsCard = () => {
                         </td>
                       </tr>
                     );
+                  const parsedInfo = {
+                    deposit: (positionInfo?.result as bigint[])?.[1] || 0n,
+                    depositTime: new Date(
+                      parseInt(
+                        (
+                          (positionInfo?.result as bigint[])?.[2] || 0n
+                        ).toString()
+                      )
+                    ),
+                    liquidatedTime: new Date(
+                      parseInt(
+                        (
+                          (positionInfo?.result as bigint[])?.[3] || 0n
+                        ).toString()
+                      )
+                    ),
+                    isLiquidated: (positionInfo?.result as bigint[])?.[3] > 1n,
+                    early: (positionInfo?.result as bigint[])?.[3] === 1n,
+                  };
                   const posId =
                     statsData.totalUserPositions[
                       totalLength - 1 - positionIndex - selectedPage * 10
                     ];
                   const posIndex =
                     totalLength - 1 - positionIndex - selectedPage * 10;
-                  const depositAmount =
-                    (positionInfo?.result as bigint[])?.[1] || 0n;
-                  const liquidated =
-                    (positionInfo?.result as bigint[])?.[7] > 0n;
-                  const early = (positionInfo?.result as bigint[])?.[7] === 1n;
+
+                  console.log({ positionInfo });
                   return (
                     <PositionRow
                       key={`position-${posId}-page-${selectedPage}`}
                       positionId={posId}
                       positionIndex={posIndex}
-                      depositAmount={depositAmount}
-                      isEarlyWithdraw={early}
-                      isLiquidated={liquidated}
-                      isLast={
-                        posId === statsData.totalUserPositions[totalLength - 1]
+                      depositAmount={parsedInfo.deposit}
+                      isEarlyWithdraw={parsedInfo.early}
+                      isLiquidated={parsedInfo.isLiquidated}
+                      liqDuration={
+                        parsedInfo.isLiquidated
+                          ? formatDuration(
+                              intervalToDuration({
+                                start: parsedInfo.depositTime,
+                                end: parsedInfo.liquidatedTime,
+                              }),
+                              { format: ["y", "M", "d", "h", "m", "s"] }
+                            )
+                          : null
                       }
                     />
                   );
@@ -399,7 +425,7 @@ const PositionRow = (props: {
   depositAmount: bigint;
   isLiquidated: boolean;
   isEarlyWithdraw: boolean;
-  isLast: boolean;
+  liqDuration?: string | null;
 }) => {
   const {
     positionId: posId,
@@ -407,7 +433,7 @@ const PositionRow = (props: {
     depositAmount,
     isLiquidated,
     isEarlyWithdraw,
-    isLast,
+    liqDuration,
   } = props;
 
   // const { config: prepExitConfig, error: prepExitError } =
@@ -451,7 +477,7 @@ const PositionRow = (props: {
           : "Pending"}
       </td>
       <td className={classNames("text-center")}>
-        -
+        {liqDuration || "-"}
         {/* {isLiquidated || !isLast || Boolean(prepExitError) ? (
           "-"
         ) : (
