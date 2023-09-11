@@ -12,16 +12,23 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import NgrAbi from "@/abi/NGR";
+import NgrAbi from "@/abi/NGR2";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 
 const ngrContract = "0xC2093B1C7cfDd4208d7Dc035C858C21D924161be";
+const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
+const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
 const ngrConfig = {
   address: ngrContract,
   abi: NgrAbi,
+} as const;
+
+const usdtConfig = {
+  address: TEST_USDT_ADDRESS,
+  abi: erc20ABI,
 } as const;
 
 export const StatsCard = () => {
@@ -29,28 +36,37 @@ export const StatsCard = () => {
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
       {
-        ...ngrConfig,
-        functionName: "TCV",
+        ...usdtConfig,
+        functionName: "balanceOf",
+        args: [ngrContract],
       },
+      // {
+      //   ...ngrConfig,
+      //   functionName: "TCV",
+      // },
       {
         ...ngrConfig,
         functionName: "cycleCounter",
       },
       {
         ...ngrConfig,
-        functionName: "currentHelixPrice",
+        functionName: "helixPrice",
+        // functionName: "currentHelixPrice",
       },
       {
         ...ngrConfig,
-        functionName: "liquidationCounter",
+        functionName: "liquidationsCounter",
+        // functionName: "liquidationCounter",
       },
       {
         ...ngrConfig,
-        functionName: "totalPositions",
+        functionName: "depositCounter",
+        // functionName: "totalPositions",
       },
       {
         ...ngrConfig,
-        functionName: "currentUserPendingLiquidation",
+        // functionName: "currentUserPendingLiquidation",
+        functionName: "userToLiquidate",
       },
       {
         ...ngrConfig,
@@ -74,10 +90,6 @@ export const StatsCard = () => {
         ...ngrConfig,
         functionName: "totalLiquidations",
       },
-      {
-        ...ngrConfig,
-        functionName: "currentUserPendingLiquidation",
-      },
     ],
   });
 
@@ -94,7 +106,6 @@ export const StatsCard = () => {
       userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
       totalDeposits: (ngrData?.[9].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
-      pendingLiquidation: (ngrData?.[11].result as bigint) || 0n,
     };
   }, [ngrData]);
   console.log({ ...statsData });
@@ -283,7 +294,8 @@ export const StatsCard = () => {
           Positions
         </h2>
         <h3 className="w-full font-bold text-lg drop-shadow text-secondary text-center">
-          Next to Liquidate: {statsData.pendingLiquidation.toLocaleString()}
+          Next to Liquidate:{" "}
+          {statsData.currentUserPendingLiquidation.toLocaleString()}
         </h3>
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
@@ -398,20 +410,20 @@ const PositionRow = (props: {
     isLast,
   } = props;
 
-  const { config: prepExitConfig, error: prepExitError } =
-    usePrepareContractWrite({
-      ...ngrConfig,
-      functionName: "earlyWithdraw",
-      enabled: !isLiquidated,
-    });
+  // const { config: prepExitConfig, error: prepExitError } =
+  //   usePrepareContractWrite({
+  //     ...ngrConfig,
+  //     functionName: "earlyWithdraw",
+  //     enabled: !isLiquidated,
+  //   });
 
-  const { write: exit, data: exitData } = useContractWrite(
-    prepExitConfig || null
-  );
-  const { isLoading: exitLoading } = useWaitForTransaction({
-    hash: exitData?.hash,
-    confirmations: 15,
-  });
+  // const { write: exit, data: exitData } = useContractWrite(
+  //   prepExitConfig || null
+  // );
+  // const { isLoading: exitLoading } = useWaitForTransaction({
+  //   hash: exitData?.hash,
+  //   confirmations: 15,
+  // });
 
   return (
     <tr>
@@ -439,7 +451,8 @@ const PositionRow = (props: {
           : "Pending"}
       </td>
       <td className={classNames("text-center")}>
-        {isLiquidated || !isLast || Boolean(prepExitError) ? (
+        -
+        {/* {isLiquidated || !isLast || Boolean(prepExitError) ? (
           "-"
         ) : (
           <button
@@ -452,14 +465,11 @@ const PositionRow = (props: {
           >
             exit
           </button>
-        )}
+        )} */}
       </td>
     </tr>
   );
 };
-
-const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
-const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
 export const ActionsCard = (props: { refetchOther: () => void }) => {
   const { refetchOther } = props;
@@ -504,8 +514,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     });
   const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
     ...ngrConfig,
-    functionName: "performUpkeep",
-    args: [`0x${"0000"}`],
+    functionName: "liquidate",
     onSuccess: refetchOther,
   });
 
@@ -536,6 +545,8 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
   const isApproved =
     approvedAmount >= parseEther(`${depositAmount}`) &&
     !(approvedAmount === 0n);
+
+  console.log(prepDepositError);
 
   useEffect(() => {
     const interval = setInterval(usdtRefetch, 10000);
