@@ -110,7 +110,6 @@ export const StatsCard = () => {
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
     };
   }, [ngrData]);
-  console.log({ ...statsData });
 
   const { data: positionData, refetch: positionRefetch } = useContractRead({
     ...ngrConfig,
@@ -162,7 +161,6 @@ export const StatsCard = () => {
     return () => clearInterval(interval);
   }, [fullRefetch]);
 
-  console.log({ positionsData });
   const totalPages = Math.ceil(statsData.totalUserPositions.length / 10);
 
   return (
@@ -328,14 +326,14 @@ export const StatsCard = () => {
                         (
                           (positionInfo?.result as bigint[])?.[2] || 0n
                         ).toString()
-                      )
+                      ) * 1000
                     ),
                     liquidatedTime: new Date(
                       parseInt(
                         (
                           (positionInfo?.result as bigint[])?.[3] || 0n
                         ).toString()
-                      )
+                      ) * 1000
                     ),
                     isLiquidated: (positionInfo?.result as bigint[])?.[3] > 1n,
                     early: (positionInfo?.result as bigint[])?.[3] === 1n,
@@ -347,7 +345,6 @@ export const StatsCard = () => {
                   const posIndex =
                     totalLength - 1 - positionIndex - selectedPage * 10;
 
-                  console.log({ positionInfo });
                   return (
                     <PositionRow
                       key={`position-${posId}-page-${selectedPage}`}
@@ -363,7 +360,11 @@ export const StatsCard = () => {
                                 start: parsedInfo.depositTime,
                                 end: parsedInfo.liquidatedTime,
                               }),
-                              { format: ["y", "M", "d", "h", "m", "s"] }
+                              {
+                                format: ["days", "hours", "minutes", "seconds"],
+                              }
+                            ).replace(/days|hours|minutes|seconds/gi, (m) =>
+                              m.substring(0, 1)
                             )
                           : null
                       }
@@ -385,7 +386,6 @@ export const StatsCard = () => {
                     selectedPage + 1 >
                     (positionsData?.pages?.length || 0) - 1
                   ) {
-                    console.log("here");
                     fetchNextPage();
                   }
                   setSelectedPage((p) => p + 1);
@@ -572,8 +572,6 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     approvedAmount >= parseEther(`${depositAmount}`) &&
     !(approvedAmount === 0n);
 
-  console.log(prepDepositError);
-
   useEffect(() => {
     const interval = setInterval(usdtRefetch, 10000);
     return () => clearInterval(interval);
@@ -620,9 +618,9 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
               Max
             </button>
           </div>
-          {((depositAmount < 100 || (depositAmount > 500 && isApproved)) && (
+          {((depositAmount < 50 || (depositAmount > 500 && isApproved)) && (
             <>
-              <span className="text-sm text-error">Min Deposit: 100 USDT</span>
+              <span className="text-sm text-error">Min Deposit: 50 USDT</span>
               <span className="text-sm text-error">Max Deposit: 500 USDT</span>
             </>
           )) ||
