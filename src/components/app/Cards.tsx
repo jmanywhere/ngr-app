@@ -19,7 +19,7 @@ import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
 import formatDuration from "date-fns/formatDuration";
 
-const ngrContract = "0xdF74201FA9a6CbCa27ef5cD4c95C617A38A4DF20";
+const ngrContract = "0xCf40F3b02A618d5cb31a383452eD8d57844783Bd";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
