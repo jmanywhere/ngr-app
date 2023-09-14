@@ -19,7 +19,7 @@ import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
 import formatDuration from "date-fns/formatDuration";
 
-const ngrContract = "0x7ba81330d9737491Ec9A187d828Ec9Cdcf50a714";
+const ngrContract = "0xc1DA6B0fF411126149f1437D6A53b41D8c1C92de";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
@@ -618,9 +618,9 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
               Max
             </button>
           </div>
-          {((depositAmount < 50 || (depositAmount > 500 && isApproved)) && (
+          {((depositAmount < 10 || (depositAmount > 500 && isApproved)) && (
             <>
-              <span className="text-sm text-error">Min Deposit: 50 USDT</span>
+              <span className="text-sm text-error">Min Deposit: 10 USDT</span>
               <span className="text-sm text-error">Max Deposit: 500 USDT</span>
             </>
           )) ||
