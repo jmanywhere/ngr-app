@@ -19,7 +19,7 @@ import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
 import formatDuration from "date-fns/formatDuration";
 
-const ngrContract = "0xc1DA6B0fF411126149f1437D6A53b41D8c1C92de";
+const ngrContract = "0x5B5F05DEB2C402E965F7fEd0a2dAC1C87569A20b";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
@@ -535,7 +535,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     usePrepareContractWrite({
       ...ngrConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`)],
+      args: [parseEther(`${100}`)],
       onSuccess: refetchOther,
     });
   const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
@@ -581,7 +581,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     <>
       <div className="text-white/90 px-4 pt-4 pb-2 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
         <div className="py-3 w-full flex flex-col items-center">
-          <div className="join">
+          {/* <div className="join">
             <div className="form-control w-full join-item">
               <input
                 className="input rounded-r-none input-primary w-full border-r-0 text-white"
@@ -603,11 +603,6 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
                 </span>
               </label>
             </div>
-            {/* <div className="form-control join-item ">
-              <label className="label cursor-pointer border-y-primary border-y-[1px] py-[11px]">
-                <input type="checkbox" className="checkbox checkbox-primary" />
-              </label>
-            </div> */}
             <button
               className="btn btn-primary rounded-l-none"
               onClick={() => {
@@ -621,10 +616,10 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
           {((depositAmount < 10 || (depositAmount > 500 && isApproved)) && (
             <>
               <span className="text-sm text-error">Min Deposit: 10 USDT</span>
-              <span className="text-sm text-error">Max Deposit: 500 USDT</span>
+              <span className="text-sm text-error">Deposit: 100 USDT</span>
             </>
           )) ||
-            null}
+            null} */}
           <button
             className={classNames(
               "btn w-full md:max-w-[300px]",
