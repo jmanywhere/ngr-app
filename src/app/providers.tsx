@@ -1,10 +1,11 @@
 "use client";
 
-import { WagmiConfig, mainnet } from "wagmi";
+import { WagmiConfig } from "wagmi";
+import { bscTestnet, bsc } from "viem/chains";
 
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
-const chains = [mainnet];
+const chains = [bscTestnet];
 const projectId = "5b3561f6a7c0319d2fcf6a9d20d6b1e8";
 
 const metadata = {
@@ -25,7 +26,7 @@ createWeb3Modal({
   chains,
   themeVariables: {
     "--w3m-color-mix": "#04BF55",
-    "--w3m-color-mix-strength": 100,
+    "--w3m-color-mix-strength": 20,
   },
 });
 

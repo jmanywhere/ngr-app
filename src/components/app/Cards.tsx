@@ -82,7 +82,7 @@ export const StatsCard = () => {
         functionName: "depositCounter",
       },
       {
-        ...ngrConfig,
+        ...ngrGrowConfig,
         functionName: "getUserPositions",
         args: [address || zeroAddress],
       },
@@ -99,8 +99,15 @@ export const StatsCard = () => {
         ...ngrConfig,
         functionName: "totalLiquidations",
       },
+      {
+        ...ngrGrowConfig,
+        functionName: "getUserPositionsInfo",
+        args: [address || zeroAddress],
+      },
     ],
   });
+
+  console.log(ngrData);
 
   const statsData = useMemo(() => {
     return {
@@ -115,6 +122,7 @@ export const StatsCard = () => {
       userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
+      userPositionsInfo: ngrData?.[11].result || [],
     };
   }, [ngrData]);
 
@@ -125,6 +133,8 @@ export const StatsCard = () => {
   });
 
   const [selectedPage, setSelectedPage] = useState(0);
+
+  console.log(statsData.totalUserPositions);
 
   const {
     data: positionsData,
@@ -141,7 +151,7 @@ export const StatsCard = () => {
           statsData.totalUserPositions[parseInt(index.toString())];
         return [
           {
-            ...ngrConfig,
+            ...ngrGrowConfig,
             functionName: "positions",
             args: [positionToGet],
           },
@@ -184,7 +194,7 @@ export const StatsCard = () => {
                 formatEther(statsData.totalDeposits)
               ).toLocaleString()}
             </p>
-            <p className="stat-desc text-slate-500">Total Made USDT</p>
+            <p className="stat-desc text-slate-500">Total in USDT</p>
           </div>
           {/* <div className="stat">
             <p className="stat-title text-slate-400">Payouts</p>
@@ -200,14 +210,17 @@ export const StatsCard = () => {
           <div className="stat">
             <p className="stat-title text-slate-400">Liquidations</p>
             <p className="stat-value">
-              {statsData.liquidations.toLocaleString()}
+              {parseFloat(formatEther(statsData.liquidations)).toLocaleString(
+                undefined,
+                { maximumFractionDigits: 2 }
+              )}
             </p>
             <p className="stat-desc text-slate-500">Total Liquidations Made</p>
           </div>
         </div>
         <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
           <div className="stat">
-            <p className="stat-title text-slate-400">Helix Price</p>
+            <p className="stat-title text-slate-400">GROW Price</p>
             <p className="stat-value">
               {parseFloat(formatEther(statsData.helixPrice)).toLocaleString()}
             </p>
@@ -232,7 +245,7 @@ export const StatsCard = () => {
         </div>
       </section>
       <ActionsCard refetchOther={fullRefetch} tcv={statsData.tcv} />
-      <section className="flex flex-col gap-4">
+      {/* <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
         </h2>
@@ -269,17 +282,6 @@ export const StatsCard = () => {
             </p>
             <div className="stat-desc text-slate-400">Total deposits</div>
           </div>
-          {/* <div className="stat">
-            <p className="stat-title text-slate-300">Active</p>
-            <p className="stat-value">
-              {(
-                statsData.userStats[3] -
-                statsData.userStats[4] -
-                statsData.userStats[5]
-              ).toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Deposits Pending</div>
-          </div> */}
           <div className="stat">
             <p className="stat-title text-slate-300">Liquidations</p>
             <p className="stat-value">
@@ -295,10 +297,10 @@ export const StatsCard = () => {
             <div className="stat-desc text-slate-400">Position Liquidated</div>
           </div>
         </div>
-      </section>
+      </section> */}
       <section className="flex flex-col">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
-          Positions
+          My Positions
         </h2>
         <h3 className="w-full font-bold text-lg drop-shadow text-secondary text-center">
           Next to Liquidate:{" "}
@@ -315,70 +317,41 @@ export const StatsCard = () => {
               </tr>
             </thead>
             <tbody>
-              {positionsData?.pages?.[selectedPage]?.map(
-                (positionInfo, positionIndex) => {
-                  const totalLength = statsData.totalUserPositions.length;
-                  if (totalLength == 0)
-                    return (
-                      <tr>
-                        <td className="text-center" colSpan={4}>
-                          No positions
-                        </td>
-                      </tr>
-                    );
-                  const parsedInfo = {
-                    deposit: (positionInfo?.result as bigint[])?.[1] || 0n,
-                    depositTime: new Date(
-                      parseInt(
-                        (
-                          (positionInfo?.result as bigint[])?.[2] || 0n
-                        ).toString()
-                      ) * 1000
-                    ),
-                    liquidatedTime: new Date(
-                      parseInt(
-                        (
-                          (positionInfo?.result as bigint[])?.[3] || 0n
-                        ).toString()
-                      ) * 1000
-                    ),
-                    isLiquidated: (positionInfo?.result as bigint[])?.[3] > 1n,
-                    early: (positionInfo?.result as bigint[])?.[3] === 1n,
-                  };
-                  const posId =
-                    statsData.totalUserPositions[
-                      totalLength - 1 - positionIndex - selectedPage * 10
-                    ];
-                  const posIndex =
-                    totalLength - 1 - positionIndex - selectedPage * 10;
-
-                  return (
-                    <PositionRow
-                      key={`position-${posId}-page-${selectedPage}`}
-                      positionId={posId}
-                      positionIndex={posIndex}
-                      depositAmount={parsedInfo.deposit}
-                      isEarlyWithdraw={parsedInfo.early}
-                      isLiquidated={parsedInfo.isLiquidated}
-                      liqDuration={
-                        parsedInfo.isLiquidated
-                          ? formatDuration(
-                              intervalToDuration({
-                                start: parsedInfo.depositTime,
-                                end: parsedInfo.liquidatedTime,
-                              }),
-                              {
-                                format: ["days", "hours", "minutes", "seconds"],
-                              }
-                            ).replace(/days|hours|minutes|seconds/gi, (m) =>
-                              m.substring(0, 1)
-                            )
-                          : null
-                      }
-                    />
-                  );
-                }
-              )}
+              {statsData.userPositionsInfo?.map((positionInfo, index) => {
+                return (
+                  <PositionRow
+                    key={`position-${index}-page-${positionInfo.owner}`}
+                    positionId={statsData.totalUserPositions[index]}
+                    positionIndex={index}
+                    depositAmount={positionInfo.amountDeposited}
+                    isEarlyWithdraw={positionInfo.early}
+                    liquidatePrice={positionInfo.liquidationPrice}
+                    isLiquidated={positionInfo.isLiquidated}
+                    canLiquidate={
+                      positionInfo.liquidationPrice < statsData.helixPrice
+                    }
+                    liqDuration={
+                      positionInfo.isLiquidated
+                        ? formatDuration(
+                            intervalToDuration({
+                              start:
+                                parseInt(positionInfo.depositTime.toString()) *
+                                1000,
+                              end:
+                                parseInt(positionInfo.liqTime.toString()) *
+                                1000,
+                            }),
+                            {
+                              format: ["days", "hours", "minutes", "seconds"],
+                            }
+                          ).replace(/days|hours|minutes|seconds/gi, (m) =>
+                            m.substring(0, 1)
+                          )
+                        : null
+                    }
+                  />
+                );
+              })}
             </tbody>
           </table>
           {statsData.totalUserPositions.length > 10 && (
@@ -430,9 +403,11 @@ const PositionRow = (props: {
   positionId: bigint;
   positionIndex: number;
   depositAmount: bigint;
+  liquidatePrice: bigint;
   isLiquidated: boolean;
   isEarlyWithdraw: boolean;
   liqDuration?: string | null;
+  canLiquidate?: boolean;
 }) => {
   const {
     positionId: posId,
@@ -441,22 +416,40 @@ const PositionRow = (props: {
     isLiquidated,
     isEarlyWithdraw,
     liqDuration,
+    liquidatePrice,
+    canLiquidate,
   } = props;
 
-  // const { config: prepExitConfig, error: prepExitError } =
-  //   usePrepareContractWrite({
-  //     ...ngrConfig,
-  //     functionName: "earlyWithdraw",
-  //     enabled: !isLiquidated,
-  //   });
+  const { config: prepExitConfig, error: prepExitError } =
+    usePrepareContractWrite({
+      ...ngrGrowConfig,
+      functionName: "earlyExit",
+      args: [posId],
+      enabled: !isLiquidated,
+    });
 
-  // const { write: exit, data: exitData } = useContractWrite(
-  //   prepExitConfig || null
-  // );
-  // const { isLoading: exitLoading } = useWaitForTransaction({
-  //   hash: exitData?.hash,
-  //   confirmations: 15,
-  // });
+  const { config: prepSelfLiqConfig, error: prepSelfLiqError } =
+    usePrepareContractWrite({
+      ...ngrGrowConfig,
+      functionName: "liquidateSelf",
+      args: [posId],
+      enabled: !isLiquidated && canLiquidate,
+    });
+
+  const { write: exit, data: exitData } = useContractWrite(
+    prepExitConfig || null
+  );
+  const { write: selfLiquidate, data: selfLiqData } = useContractWrite(
+    prepSelfLiqConfig || null
+  );
+  const { isLoading: exitLoading } = useWaitForTransaction({
+    hash: exitData?.hash,
+    confirmations: 5,
+  });
+  const { isLoading: selfLiqLoading } = useWaitForTransaction({
+    hash: selfLiqData?.hash,
+    confirmations: 5,
+  });
 
   return (
     <tr>
@@ -469,23 +462,36 @@ const PositionRow = (props: {
       <td
         className={classNames(
           "text-right",
-          isEarlyWithdraw ? "text-error" : "",
-          isEarlyWithdraw || isLiquidated ? "" : "text-primary text-xs"
+          isEarlyWithdraw
+            ? "text-error"
+            : isLiquidated
+            ? "text-primary text-xs"
+            : "text-white/80"
         )}
       >
-        {isEarlyWithdraw
-          ? parseFloat(
-              formatEther((depositAmount * 94n) / 100n)
-            ).toLocaleString()
-          : isLiquidated
-          ? parseFloat(
-              formatEther((depositAmount * 106n) / 100n)
-            ).toLocaleString()
-          : "Pending"}
+        {isEarlyWithdraw ? (
+          parseFloat(formatEther((depositAmount * 92n) / 100n)).toLocaleString()
+        ) : isLiquidated ? (
+          parseFloat(
+            formatEther((depositAmount * 106n) / 100n)
+          ).toLocaleString()
+        ) : canLiquidate ? (
+          <button
+            className={classNames(
+              "btn btn-secondary btn-xs",
+              selfLiqLoading ? "loading loading-spinner" : ""
+            )}
+            onClick={selfLiquidate}
+            disabled={selfLiqLoading}
+          >
+            Profit
+          </button>
+        ) : (
+          parseFloat(formatEther(liquidatePrice)).toLocaleString()
+        )}
       </td>
       <td className={classNames("text-center")}>
-        {liqDuration || "-"}
-        {/* {isLiquidated || !isLast || Boolean(prepExitError) ? (
+        {liqDuration ? (
           "-"
         ) : (
           <button
@@ -498,7 +504,7 @@ const PositionRow = (props: {
           >
             exit
           </button>
-        )} */}
+        )}
       </td>
     </tr>
   );
@@ -545,11 +551,6 @@ export const ActionsCard = (props: {
       args: [parseEther(`${depositAmount}`), liquidateProfit],
       onSuccess: refetchOther,
     });
-  const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
-    ...ngrConfig,
-    functionName: "liquidate",
-    onSuccess: refetchOther,
-  });
 
   const { write: deposit, data: depositData } = useContractWrite(
     depositConfig || null
@@ -557,19 +558,12 @@ export const ActionsCard = (props: {
   const { write: approve, data: approveData } = useContractWrite(
     prepApproveConfig || null
   );
-  const { write: upkeep, data: upkeepData } = useContractWrite(
-    upkeepConfig || null
-  );
   const { isLoading: depositLoading } = useWaitForTransaction({
     hash: depositData?.hash,
     confirmations: 5,
   });
   const { isLoading: approveLoading } = useWaitForTransaction({
     hash: approveData?.hash,
-    confirmations: 5,
-  });
-  const { isLoading: upkeepLoading } = useWaitForTransaction({
-    hash: upkeepData?.hash,
     confirmations: 5,
   });
 
