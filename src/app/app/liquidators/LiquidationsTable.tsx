@@ -9,6 +9,7 @@ import { growConfig, ngrGrowConfig } from "@/data/contracts";
 import { formatEther, parseEther } from "viem";
 import { useImmer } from "use-immer";
 import classNames from "classnames";
+import { current } from "immer";
 
 export default function LiquidationsTable() {
   const [selectedIds, setSelectedIds] = useImmer<Array<number>>([]);
@@ -33,11 +34,19 @@ export default function LiquidationsTable() {
     ],
     watch: true,
   });
+
+  const { currentPrice, queuePosition, liquidatorAmount, totalAmount } = {
+    currentPrice: (liquidationInfo?.[0].result || 0n) as bigint,
+    queuePosition: (liquidationInfo?.[1].result || 0n) as bigint,
+    liquidatorAmount: (liquidationInfo?.[2].result || 0n) as bigint,
+    totalAmount: (liquidationInfo?.[3].result || 0n) as bigint,
+  };
+
   const { data: positions } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getPositions",
-    args: [0n, liquidationInfo?.[1].result || 0n],
-    enabled: (liquidationInfo?.[1].result || 0n) > 0n,
+    args: [0n, queuePosition],
+    enabled: (queuePosition > 0n) as boolean,
     watch: true,
   });
 
@@ -62,19 +71,29 @@ export default function LiquidationsTable() {
       confirmations: 5,
     });
 
-  const descPositions = positions
-    ?.map((position, index) => {
+  const descPositions = (
+    positions?.map((position, index) => {
       return { ...position, index };
-    })
-    ?.toReversed();
+    }) as Array<{
+      owner: `0x${string}`;
+      depositTime: bigint;
+      liqTime: bigint;
+      amountDeposited: bigint;
+      growAmount: bigint;
+      liquidationPrice: bigint;
+      isLiquidated: boolean;
+      early: boolean;
+      index: number;
+    }>
+  )?.reverse();
   const allPositions = positions?.length || 0;
   return (
     <>
       <h2>
         Current Price:{" "}
-        {parseFloat(
-          formatEther(liquidationInfo?.[0].result || 0n)
-        ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
+        {parseFloat(formatEther(currentPrice)).toLocaleString(undefined, {
+          maximumFractionDigits: 6,
+        })}
       </h2>
       <div className="w-full flex justify-center items-center py-2">
         <button
@@ -109,11 +128,10 @@ export default function LiquidationsTable() {
           <tbody className="text-white/70">
             {descPositions?.map((position, tableIndex) => {
               const currentAmount =
-                (position.growAmount * (liquidationInfo?.[0].result || 0n)) /
+                ((position.growAmount as bigint) * currentPrice) /
                 parseEther("1");
               const split = currentAmount / 100n;
-              const canLiquidate =
-                position.liquidationPrice < (liquidationInfo?.[0].result || 0n);
+              const canLiquidate = position.liquidationPrice < currentPrice;
               if (!canLiquidate) return null;
               return (
                 <tr key={`Liquidation-index-${position.index}`}>
