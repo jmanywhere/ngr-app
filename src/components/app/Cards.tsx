@@ -54,12 +54,8 @@ export const StatsCard = () => {
       {
         ...usdtConfig,
         functionName: "balanceOf",
-        args: [ngrContract],
+        args: [growToken],
       },
-      // {
-      //   ...ngrConfig,
-      //   functionName: "TCV",
-      // },
       {
         ...ngrConfig,
         functionName: "cycleCounter",
@@ -67,12 +63,10 @@ export const StatsCard = () => {
       {
         ...growConfig,
         functionName: "calculatePrice",
-        // functionName: "currentHelixPrice",
       },
       {
-        ...ngrConfig,
-        functionName: "liquidationsCounter",
-        // functionName: "liquidationCounter",
+        ...ngrGrowConfig,
+        functionName: "totalLiquidations",
       },
       {
         ...ngrGrowConfig,
@@ -119,7 +113,7 @@ export const StatsCard = () => {
       deposits: (ngrData?.[6].result as bigint) || 0n,
       totalUserPositions: (ngrData?.[7].result as bigint[]) || [],
       userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
-      totalDeposits: (ngrData?.[9].result as bigint) || 0n,
+      totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
     };
   }, [ngrData]);
@@ -192,7 +186,7 @@ export const StatsCard = () => {
             </p>
             <p className="stat-desc text-slate-500">Total Made USDT</p>
           </div>
-          <div className="stat">
+          {/* <div className="stat">
             <p className="stat-title text-slate-400">Payouts</p>
             <p className="stat-value">
               {parseFloat(
@@ -202,7 +196,7 @@ export const StatsCard = () => {
             <p className="stat-desc text-slate-500">
               Total Principal + Interest USDT
             </p>
-          </div>
+          </div> */}
           <div className="stat">
             <p className="stat-title text-slate-400">Liquidations</p>
             <p className="stat-value">
@@ -226,7 +220,7 @@ export const StatsCard = () => {
             </p>
             <div className="stat-desc text-slate-500">Total Value USDT</div>
           </div>
-          <div className="stat">
+          {/* <div className="stat">
             <p className="stat-title text-slate-400">Cycle</p>
             <p className="stat-value">
               {statsData.cycleCounter.toLocaleString()}
@@ -234,10 +228,10 @@ export const StatsCard = () => {
             <div className="stat-desc text-slate-500">
               Times Price has reset
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
-      <ActionsCard refetchOther={fullRefetch} />
+      <ActionsCard refetchOther={fullRefetch} tcv={statsData.tcv} />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
@@ -510,8 +504,11 @@ const PositionRow = (props: {
   );
 };
 
-export const ActionsCard = (props: { refetchOther: () => void }) => {
-  const { refetchOther } = props;
+export const ActionsCard = (props: {
+  refetchOther: () => void;
+  tcv: bigint;
+}) => {
+  const { refetchOther, tcv } = props;
   const { address } = useAccount();
   const { data: usdtBalance, refetch: usdtRefetch } = useContractReads({
     contracts: [
@@ -535,20 +532,21 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
   });
 
   const [depositAmount, setDepositAmount] = useState(0);
+  const [liquidateProfit, setLiquidateProfit] = useState(4);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
     address: TEST_USDT_ADDRESS,
     abi: erc20ABI,
     functionName: "approve",
-    args: [growNGR, parseEther(`${1_000_000}`)],
+    args: [growNGR, parseEther(`${1000000}`)],
     onSuccess: refetchOther,
   });
 
   const { config: depositConfig, error: prepDepositError } =
     usePrepareContractWrite({
-      ...ngrConfig,
+      ...ngrGrowConfig,
       functionName: "deposit",
-      args: [parseEther(`${100}`)],
+      args: [parseEther(`${depositAmount}`), liquidateProfit],
       onSuccess: refetchOther,
     });
   const { config: upkeepConfig, error: upkeepError } = usePrepareContractWrite({
@@ -590,11 +588,14 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     return () => clearInterval(interval);
   }, [usdtRefetch, address]);
 
+  const maxDeposit =
+    tcv < parseEther("1000") ? 100 : parseFloat(formatEther(tcv / 10n));
+
   return (
     <>
       <div className="text-white/90 px-4 pt-4 pb-2 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
         <div className="py-3 w-full flex flex-col items-center">
-          {/* <div className="join">
+          <div className="join">
             <div className="form-control w-full join-item">
               <input
                 className="input rounded-r-none input-primary w-full border-r-0 text-white"
@@ -619,20 +620,79 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
             <button
               className="btn btn-primary rounded-l-none"
               onClick={() => {
-                if (userUSDTBalance > parseEther("500")) setDepositAmount(500);
-                else setDepositAmount(parseFloat(formatEther(userUSDTBalance)));
+                setDepositAmount(maxDeposit);
               }}
             >
               Max
             </button>
           </div>
-          {((depositAmount < 10 || (depositAmount > 500 && isApproved)) && (
+          <div className="flex flex-row items-center gap-4 py-2">
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="profit"
+                className="radio radio-primary radio-sm"
+                checked={liquidateProfit == 4}
+                onClick={() => setLiquidateProfit(4)}
+              />
+              <label className="label label-text">4%</label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="profit"
+                className="radio radio-primary radio-sm"
+                checked={liquidateProfit == 5}
+                onClick={() => setLiquidateProfit(5)}
+              />
+              <label className="label label-text">5%</label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="profit"
+                className="radio radio-primary radio-sm"
+                checked={liquidateProfit == 6}
+                onClick={() => setLiquidateProfit(6)}
+              />
+              <label className="label label-text">6%</label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="profit"
+                className="radio radio-primary radio-sm"
+                checked={liquidateProfit == 7}
+                onClick={() => setLiquidateProfit(7)}
+              />
+              <label className="label label-text">7%</label>
+            </div>
+            <div className="flex flex-col items-center">
+              <input
+                type="radio"
+                name="profit"
+                className="radio radio-primary radio-sm"
+                checked={liquidateProfit == 8}
+                onClick={() => setLiquidateProfit(8)}
+              />
+              <label className="label label-text">8%</label>
+            </div>
+          </div>
+          {((depositAmount < 10 ||
+            (depositAmount > maxDeposit && isApproved)) && (
             <>
               <span className="text-sm text-error">Min Deposit: 10 USDT</span>
-              <span className="text-sm text-error">Deposit: 100 USDT</span>
+              <span className="text-sm text-error">
+                Deposit:{" "}
+                {maxDeposit.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                USDT
+              </span>
             </>
           )) ||
-            null} */}
+            null}
+
           <button
             className={classNames(
               "btn w-full md:max-w-[300px]",
@@ -654,7 +714,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
             liquidation incurs a 6% penalty.
           </p>
         </div>
-        <button
+        {/* <button
           className={classNames(
             "btn w-full md:max-w-[300px] btn-accent",
             upkeepError ? "btn-disabled" : "",
@@ -665,7 +725,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
           }}
         >
           Upkeep
-        </button>
+        </button> */}
       </div>
     </>
   );
