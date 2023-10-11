@@ -311,10 +311,6 @@ export const StatsCard = () => {
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           My Positions
         </h2>
-        <h3 className="w-full font-bold text-lg drop-shadow text-secondary text-center">
-          Next to Liquidate:{" "}
-          {statsData.currentUserPendingLiquidation.toLocaleString()}
-        </h3>
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
             <thead>
@@ -682,7 +678,7 @@ export const ActionsCard = (props: {
             <>
               <span className="text-sm text-error">Min Deposit: 10 USDT</span>
               <span className="text-sm text-error">
-                Deposit:{" "}
+                Max Deposit:{" "}
                 {maxDeposit.toLocaleString(undefined, {
                   maximumFractionDigits: 2,
                 })}{" "}
@@ -696,14 +692,23 @@ export const ActionsCard = (props: {
             className={classNames(
               "btn w-full md:max-w-[300px]",
               isApproved ? "btn-primary" : "btn-secondary",
-              isApproved && prepDepositError ? "btn-disabled" : "",
-              depositLoading || approveLoading ? "btn-loading loading-ring" : ""
+              (isApproved && prepDepositError) ||
+                depositLoading ||
+                approveLoading
+                ? "btn-disabled"
+                : ""
             )}
             onClick={() => {
               isApproved ? deposit?.() : approve?.();
             }}
           >
-            {isApproved ? "deposit" : "approve"}
+            {depositLoading || approveLoading ? (
+              <span className="loading loading-ring" />
+            ) : isApproved ? (
+              "deposit"
+            ) : (
+              "approve"
+            )}
           </button>
         </div>
         <div className="flex flex-col items-center justify-center py-5 max-w-xs">
