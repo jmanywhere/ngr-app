@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import Web3HeaderBtn from "./W3HeaderBtn";
 import { useState } from "react";
 import classNames from "classnames";
 
@@ -70,7 +69,7 @@ const MenuButton = () => {
         >
           Invest
         </Link>
-        <Web3HeaderBtn />
+        <w3m-button balance="hide" />
       </nav>
     </details>
   );

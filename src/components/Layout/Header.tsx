@@ -1,7 +1,6 @@
 import Image from "next/image";
 import logo from "../../../public/images/Logo.png";
 import Link from "next/link";
-import Web3HeaderBtn from "./W3HeaderBtn";
 import MenuButton from "./MenuButton";
 
 const Header = () => {
@@ -44,7 +43,7 @@ const Header = () => {
           </Link>
         </nav>
         <div className="hidden md:block">
-          <Web3HeaderBtn />
+          <w3m-button balance="hide" />
         </div>
         <MenuButton />
       </div>

@@ -1,29 +1,34 @@
 "use client";
 
-import { EthereumClient } from "@web3modal/ethereum";
-import { Web3Modal } from "@web3modal/react";
-import * as React from "react";
-import { WagmiConfig } from "wagmi";
+import { WagmiConfig, mainnet } from "wagmi";
 
-import { chains, config, walletConnectProjectId } from "../wagmiConfig";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
-const ethereumClient = new EthereumClient(config, chains);
+const chains = [mainnet];
+const projectId = "5b3561f6a7c0319d2fcf6a9d20d6b1e8";
+
+const metadata = {
+  name: "NextGen ROI",
+  description: "THE FIRST EVER FULLY COLLATERALIZED ACCELERATED ROI PLATFORM.",
+  url: "https://nextgenroi.com/",
+};
+
+const wagmiConfig = defaultWagmiConfig({
+  chains,
+  projectId,
+  metadata,
+});
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  chains,
+  themeVariables: {
+    "--w3m-color-mix": "#04BF55",
+    "--w3m-color-mix-strength": 100,
+  },
+});
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  return (
-    <WagmiConfig config={config}>
-      {mounted && children}
-      <Web3Modal
-        projectId={walletConnectProjectId}
-        ethereumClient={ethereumClient}
-        themeVariables={{
-          "--w3m-accent-color": "#04BE54",
-          "--w3m-background-color": "#04BF55",
-          "--w3m-accent-fill-color": "#000000",
-        }}
-      />
-    </WagmiConfig>
-  );
+  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }

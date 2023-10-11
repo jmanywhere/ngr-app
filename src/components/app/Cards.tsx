@@ -524,10 +524,6 @@ export const ActionsCard = (props: {
         functionName: "allowance",
         args: [address || zeroAddress, growNGR],
       },
-      {
-        ...ngrConfig,
-        functionName: "canLiquidate",
-      },
     ],
   });
 
@@ -633,7 +629,7 @@ export const ActionsCard = (props: {
                 name="profit"
                 className="radio radio-primary radio-sm"
                 checked={liquidateProfit == 4}
-                onClick={() => setLiquidateProfit(4)}
+                onChange={() => setLiquidateProfit(4)}
               />
               <label className="label label-text">4%</label>
             </div>
@@ -643,7 +639,7 @@ export const ActionsCard = (props: {
                 name="profit"
                 className="radio radio-primary radio-sm"
                 checked={liquidateProfit == 5}
-                onClick={() => setLiquidateProfit(5)}
+                onChange={() => setLiquidateProfit(5)}
               />
               <label className="label label-text">5%</label>
             </div>
@@ -653,7 +649,7 @@ export const ActionsCard = (props: {
                 name="profit"
                 className="radio radio-primary radio-sm"
                 checked={liquidateProfit == 6}
-                onClick={() => setLiquidateProfit(6)}
+                onChange={() => setLiquidateProfit(6)}
               />
               <label className="label label-text">6%</label>
             </div>
@@ -663,7 +659,7 @@ export const ActionsCard = (props: {
                 name="profit"
                 className="radio radio-primary radio-sm"
                 checked={liquidateProfit == 7}
-                onClick={() => setLiquidateProfit(7)}
+                onChange={() => setLiquidateProfit(7)}
               />
               <label className="label label-text">7%</label>
             </div>
@@ -673,7 +669,7 @@ export const ActionsCard = (props: {
                 name="profit"
                 className="radio radio-primary radio-sm"
                 checked={liquidateProfit == 8}
-                onClick={() => setLiquidateProfit(8)}
+                onChange={() => setLiquidateProfit(8)}
               />
               <label className="label label-text">8%</label>
             </div>
