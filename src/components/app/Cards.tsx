@@ -122,7 +122,16 @@ export const StatsCard = () => {
       userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
-      userPositionsInfo: ngrData?.[11].result || [],
+      userPositionsInfo: (ngrData?.[11].result || []) as readonly {
+        owner: `0x${string}`;
+        depositTime: bigint;
+        liqTime: bigint;
+        amountDeposited: bigint;
+        growAmount: bigint;
+        liquidationPrice: bigint;
+        isLiquidated: boolean;
+        early: boolean;
+      }[],
     };
   }, [ngrData]);
 
