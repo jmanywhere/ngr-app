@@ -75,9 +75,8 @@ export const StatsCard = () => {
         // functionName: "liquidationCounter",
       },
       {
-        ...ngrConfig,
-        functionName: "depositCounter",
-        // functionName: "totalPositions",
+        ...ngrGrowConfig,
+        functionName: "totalDeposits",
       },
       {
         ...ngrConfig,
@@ -526,7 +525,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
         address: TEST_USDT_ADDRESS,
         abi: erc20ABI,
         functionName: "allowance",
-        args: [address || zeroAddress, ngrContract],
+        args: [address || zeroAddress, growNGR],
       },
       {
         ...ngrConfig,
