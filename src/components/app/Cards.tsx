@@ -1,6 +1,5 @@
 "use client";
 
-import { Web3Button } from "@web3modal/react";
 import {
   erc20ABI,
   paginatedIndexesConfig,
@@ -13,6 +12,8 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import NgrAbi from "@/abi/NGR2";
+import GrowNGR from "@/abi/NGR_Grow";
+import GrowToken from "@/abi/Grow";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
@@ -23,6 +24,9 @@ const ngrContract = "0x0aC58925A4C668AB30d29fdBEC267A795d9f7891";
 const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
+const growNGR = "0xf5CDF704219B6aa677cFBabD38c7989219A62828";
+const growToken = "0x93cbD7a800eC3bBFC8466e3D0799A107aA2a10E2";
+
 const ngrConfig = {
   address: ngrContract,
   abi: NgrAbi,
@@ -31,6 +35,16 @@ const ngrConfig = {
 const usdtConfig = {
   address: TEST_USDT_ADDRESS,
   abi: erc20ABI,
+} as const;
+
+const ngrGrowConfig = {
+  address: growNGR,
+  abi: GrowNGR,
+} as const;
+
+const growConfig = {
+  address: growToken,
+  abi: GrowToken,
 } as const;
 
 export const StatsCard = () => {
@@ -51,8 +65,8 @@ export const StatsCard = () => {
         functionName: "cycleCounter",
       },
       {
-        ...ngrConfig,
-        functionName: "helixPrice",
+        ...growConfig,
+        functionName: "calculatePrice",
         // functionName: "currentHelixPrice",
       },
       {
@@ -527,7 +541,7 @@ export const ActionsCard = (props: { refetchOther: () => void }) => {
     address: TEST_USDT_ADDRESS,
     abi: erc20ABI,
     functionName: "approve",
-    args: [ngrContract, parseEther(`${1_000_000}`)],
+    args: [growNGR, parseEther(`${1_000_000}`)],
     onSuccess: refetchOther,
   });
 
