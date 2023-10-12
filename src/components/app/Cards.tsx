@@ -20,32 +20,17 @@ import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
 import formatDuration from "date-fns/formatDuration";
 
-const ngrContract = "0x0aC58925A4C668AB30d29fdBEC267A795d9f7891";
-const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
+import {
+  TEST_USDT_ADDRESS,
+  growNGR,
+  growToken,
+  ngrConfig,
+  ngrGrowConfig,
+  growConfig,
+  usdtConfig,
+} from "@/data/contracts";
+
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
-
-const growNGR = "0xf5CDF704219B6aa677cFBabD38c7989219A62828";
-const growToken = "0x93cbD7a800eC3bBFC8466e3D0799A107aA2a10E2";
-
-const ngrConfig = {
-  address: ngrContract,
-  abi: NgrAbi,
-} as const;
-
-const usdtConfig = {
-  address: TEST_USDT_ADDRESS,
-  abi: erc20ABI,
-} as const;
-
-const ngrGrowConfig = {
-  address: growNGR,
-  abi: GrowNGR,
-} as const;
-
-const growConfig = {
-  address: growToken,
-  abi: GrowToken,
-} as const;
 
 export const StatsCard = () => {
   const { address } = useAccount();
