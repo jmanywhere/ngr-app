@@ -99,7 +99,12 @@ export const StatsCard = () => {
       currentUserPendingLiquidation: (ngrData?.[5].result as bigint) || 0n,
       deposits: (ngrData?.[6].result as bigint) || 0n,
       totalUserPositions: (ngrData?.[7].result as bigint[]) || [],
-      userStats: ngrData?.[8].result || new Array(4).fill(0n),
+      userStats: (ngrData?.[8].result || new Array(4).fill(0n)) as [
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ],
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
       userPositionsInfo: (ngrData?.[11].result || []) as readonly {
@@ -115,13 +120,13 @@ export const StatsCard = () => {
     };
   }, [ngrData]);
 
-  const { data: positionData, refetch: positionRefetch } = useContractRead({
-    ...ngrConfig,
-    functionName: "positions",
-    args: [statsData.userStats[6] || 0n],
-  });
+  // const { data: positionData, refetch: positionRefetch } = useContractRead({
+  //   ...ngrConfig,
+  //   functionName: "positions",
+  //   args: [statsData.userStats[6] || 0n],
+  // });
 
-  const [selectedPage, setSelectedPage] = useState(0);
+  // const [selectedPage, setSelectedPage] = useState(0);
 
   console.log(statsData.totalUserPositions);
 
@@ -156,9 +161,9 @@ export const StatsCard = () => {
 
   const fullRefetch = useCallback(() => {
     ngrDataRefetch();
-    positionRefetch();
+    // positionRefetch();
     // positionsRefetch();
-  }, [ngrDataRefetch, positionRefetch]);
+  }, [ngrDataRefetch]);
 
   useEffect(() => {
     const interval = setInterval(() => {
