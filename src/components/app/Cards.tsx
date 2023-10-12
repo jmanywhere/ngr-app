@@ -67,7 +67,7 @@ export const StatsCard = () => {
         args: [address || zeroAddress],
       },
       {
-        ...ngrConfig,
+        ...ngrGrowConfig,
         functionName: "userStats",
         args: [address || zeroAddress],
       },
@@ -99,7 +99,7 @@ export const StatsCard = () => {
       currentUserPendingLiquidation: (ngrData?.[5].result as bigint) || 0n,
       deposits: (ngrData?.[6].result as bigint) || 0n,
       totalUserPositions: (ngrData?.[7].result as bigint[]) || [],
-      userStats: (ngrData?.[8].result as bigint[]) || new Array(7).fill(0n),
+      userStats: ngrData?.[8].result || new Array(4).fill(0n),
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
       userPositionsInfo: (ngrData?.[11].result || []) as readonly {
@@ -125,40 +125,40 @@ export const StatsCard = () => {
 
   console.log(statsData.totalUserPositions);
 
-  const {
-    data: positionsData,
-    fetchNextPage,
-    refetch: positionsRefetch,
-    isLoading: positionsLoading,
-  } = useContractInfiniteReads({
-    cacheKey: "user_positions_1",
-    ...paginatedIndexesConfig(
-      (index: number) => {
-        if (index >= statsData.totalUserPositions.length)
-          return [] as readonly any[];
-        const positionToGet =
-          statsData.totalUserPositions[parseInt(index.toString())];
-        return [
-          {
-            ...ngrGrowConfig,
-            functionName: "positions",
-            args: [positionToGet],
-          },
-        ];
-      },
-      {
-        start: statsData.totalUserPositions.length - 1,
-        perPage: 10,
-        direction: "decrement",
-      }
-    ),
-  });
+  // const {
+  //   data: positionsData,
+  //   fetchNextPage,
+  //   refetch: positionsRefetch,
+  //   isLoading: positionsLoading,
+  // } = useContractInfiniteReads({
+  //   cacheKey: "user_positions_1",
+  //   ...paginatedIndexesConfig(
+  //     (index: number) => {
+  //       if (index >= statsData.totalUserPositions.length)
+  //         return [] as readonly any[];
+  //       const positionToGet =
+  //         statsData.totalUserPositions[parseInt(index.toString())];
+  //       return [
+  //         {
+  //           ...ngrGrowConfig,
+  //           functionName: "positions",
+  //           args: [positionToGet],
+  //         },
+  //       ];
+  //     },
+  //     {
+  //       start: statsData.totalUserPositions.length - 1,
+  //       perPage: 10,
+  //       direction: "decrement",
+  //     }
+  //   ),
+  // });
 
   const fullRefetch = useCallback(() => {
     ngrDataRefetch();
     positionRefetch();
-    positionsRefetch();
-  }, [ngrDataRefetch, positionRefetch, positionsRefetch]);
+    // positionsRefetch();
+  }, [ngrDataRefetch, positionRefetch]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -237,7 +237,7 @@ export const StatsCard = () => {
         </div>
       </section>
       <ActionsCard refetchOther={fullRefetch} tcv={statsData.tcv} />
-      {/* <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
         </h2>
@@ -257,16 +257,14 @@ export const StatsCard = () => {
             <div className="stat-desc text-slate-400">USDT</div>
           </div>
           <div className="stat">
-            <p className="stat-title text-slate-300">Last Liq.</p>
+            <p className="stat-title text-slate-300">Other Profits</p>
             <p className="stat-value">
-              {parseFloat(
-                formatEther(((positionData?.[1] || 0n) * 106n) / 100n)
-              ).toLocaleString()}
+              {parseFloat(formatEther(statsData.userStats[3])).toLocaleString()}
             </p>
             <div className="stat-desc text-slate-400">USDT</div>
           </div>
         </div>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
+        {/* <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
           <div className="stat">
             <p className="stat-title text-slate-300">Total</p>
             <p className="stat-value">
@@ -288,8 +286,8 @@ export const StatsCard = () => {
             </p>
             <div className="stat-desc text-slate-400">Position Liquidated</div>
           </div>
-        </div>
-      </section> */}
+        </div> */}
+      </section>
       <section className="flex flex-col">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           My Positions
@@ -342,7 +340,7 @@ export const StatsCard = () => {
               })}
             </tbody>
           </table>
-          {statsData.totalUserPositions.length > 10 && (
+          {/* {statsData.totalUserPositions.length > 10 && (
             <div className="flex flex-row items-center justify-between">
               <button
                 className={classNames(
@@ -380,7 +378,7 @@ export const StatsCard = () => {
                 {">"}
               </button>
             </div>
-          )}
+          )} */}
         </div>
       </section>
     </>
