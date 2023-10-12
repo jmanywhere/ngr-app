@@ -231,7 +231,10 @@ export const StatsCard = () => {
           <div className="stat">
             <p className="stat-title text-slate-400">GROW Price</p>
             <p className="stat-value">
-              {parseFloat(formatEther(statsData.helixPrice)).toLocaleString()}
+              {parseFloat(formatEther(statsData.helixPrice)).toLocaleString(
+                undefined,
+                { maximumFractionDigits: 6 }
+              )}
             </p>
             <div className="stat-desc text-slate-500">USD</div>
           </div>
@@ -540,6 +543,7 @@ export const ActionsCard = (props: {
 
   const [depositAmount, setDepositAmount] = useState(0);
   const [liquidateProfit, setLiquidateProfit] = useState(4);
+  const [autoReinvest, setAutoReinvest] = useState(false);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
     address: TEST_USDT_ADDRESS,
@@ -553,7 +557,7 @@ export const ActionsCard = (props: {
     usePrepareContractWrite({
       ...ngrGrowConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`), liquidateProfit],
+      args: [parseEther(`${depositAmount}`), liquidateProfit, autoReinvest],
       onSuccess: refetchOther,
     });
 
@@ -621,6 +625,16 @@ export const ActionsCard = (props: {
               Max
             </button>
           </div>
+          <label className="label cursor-pointer">
+            <span className="label-text">Auto reinvest</span>
+            <input
+              type="radio"
+              name="reinvest"
+              className="radio radio-primary radio-sm"
+              checked={autoReinvest}
+              onChange={() => setAutoReinvest((p) => !p)}
+            />
+          </label>
           <div className="flex flex-row items-center gap-4 py-2">
             <div className="flex flex-col items-center">
               <input

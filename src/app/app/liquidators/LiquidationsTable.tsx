@@ -132,7 +132,7 @@ export default function LiquidationsTable() {
                 parseEther("1");
               const split = currentAmount / 100n;
               const canLiquidate = position.liquidationPrice < currentPrice;
-              if (!canLiquidate) return null;
+              if (position.isLiquidated) return null;
               return (
                 <tr key={`Liquidation-index-${position.index}`}>
                   <th>{allPositions - tableIndex - 1}</th>
