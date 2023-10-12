@@ -568,7 +568,10 @@ export const ActionsCard = (props: {
   }, [usdtRefetch, address]);
 
   const maxDeposit =
-    tcv < parseEther("1000") ? 100 : parseFloat(formatEther(tcv / 10n));
+    tcv < parseEther("1000")
+      ? 100
+      : parseInt(formatEther(tcv / 10n)) -
+        (parseInt(formatEther(tcv / 10n)) % 10);
 
   return (
     <>
@@ -586,6 +589,7 @@ export const ActionsCard = (props: {
                   else setDepositAmount(e.target.valueAsNumber);
                 }}
                 onFocus={(e) => e.target.select()}
+                step={10}
               />
               <label className="label">
                 <span className="label-text-alt  font-semibold">
@@ -606,7 +610,9 @@ export const ActionsCard = (props: {
             </button>
           </div>
           <label className="label cursor-pointer">
-            <span className="label-text">Auto reinvest</span>
+            <span className="label-text pr-2 font-bold text-white/90">
+              Auto reinvest
+            </span>
             <input
               type="radio"
               name="reinvest"
@@ -615,6 +621,7 @@ export const ActionsCard = (props: {
               onChange={() => setAutoReinvest((p) => !p)}
             />
           </label>
+          <div className="w-full h-[1px] bg-white/80 my-2" />
           <div className="flex flex-row items-center gap-4 py-2">
             <div className="flex flex-col items-center">
               <input
@@ -672,9 +679,9 @@ export const ActionsCard = (props: {
             <>
               <span className="text-sm text-error">Min Deposit: 10 USDT</span>
               <span className="text-sm text-error">
-                Max Deposit:{" "}
+                Only multiples of 10 with a max of{" "}
                 {maxDeposit.toLocaleString(undefined, {
-                  maximumFractionDigits: 2,
+                  maximumFractionDigits: 0,
                 })}{" "}
                 USDT
               </span>
