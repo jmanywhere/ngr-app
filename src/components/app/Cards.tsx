@@ -11,9 +11,6 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import NgrAbi from "@/abi/NGR2";
-import GrowNGR from "@/abi/NGR_Grow";
-import GrowToken from "@/abi/Grow";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
@@ -29,8 +26,6 @@ import {
   growConfig,
   usdtConfig,
 } from "@/data/contracts";
-
-const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
 export const StatsCard = () => {
   const { address } = useAccount();
