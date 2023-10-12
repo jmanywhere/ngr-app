@@ -89,11 +89,13 @@ export default function LiquidationsTable() {
   const allPositions = positions?.length || 0;
   return (
     <>
-      <h2>
-        Current Price:{" "}
-        {parseFloat(formatEther(currentPrice)).toLocaleString(undefined, {
-          maximumFractionDigits: 6,
-        })}
+      <h2 className="text-xl text-center whitespace-pre-wrap bg-slate-800 w-full max-w-xs p-4 rounded-xl text-slate-300">
+        Current Price:{"\n"}
+        <span className="text-4xl font-bold text-primary">
+          {parseFloat(formatEther(currentPrice)).toLocaleString(undefined, {
+            maximumFractionDigits: 6,
+          })}
+        </span>
       </h2>
       <div className="w-full flex justify-center items-center py-2">
         <button
