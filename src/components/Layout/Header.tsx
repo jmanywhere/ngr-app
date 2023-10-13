@@ -1,13 +1,17 @@
 import Image from "next/image";
-import logo from "../../../public/images/Logo.png";
+import logo from "../../../public/Logo.png";
 import Link from "next/link";
 import MenuButton from "./MenuButton";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 pl-6 pr-0 lg:pr-6 py-2 border-b-[1px] border-black">
-      <Link href="/">
-        <Image src={logo} alt="NextGen Logo" className="w-[150px] h-[50]" />
+    <header className="flex items-center justify-between bg-white w-full fixed top-0 z-50 pr-0 lg:pr-6 border-b-[1px] border-black flex-row ">
+      <Link href="/" className="max-h-[75px] overflow-hidden">
+        <Image
+          src={logo}
+          alt="NextGen Logo"
+          className="w-[200px] -translate-y-[calc((125px-75px)/8)] transform"
+        />
       </Link>
       <div className="flex flex-row items-center">
         <nav className="hidden text-sm lg:flex px-3 flex-row items-center gap-3">

@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import barsAndLogo from "../../public/images/Image.png";
 import barsAndGuy from "../../public/images/Image_1.png";
-import Logo from "../../public/images/Logo.png";
+import Logo from "../../public/Logo.png";
 
 const Page: NextPage = () => {
   return (
@@ -84,7 +84,7 @@ const Page: NextPage = () => {
         </div>
       </section>
       <section className="flex flex-col items-center py-14 px-3">
-        <Image src={Logo} alt="logo" className="pb-10" />
+        <Image src={Logo} alt="logo" className="pb-10" height={300} />
         <p className="text-center px-5 text-xs text-black font-medium lg:max-w-[1024px]">
           NGR provides investors repeated returns of 6%. Each investment can
           take a few weeks, a few days…or even a few hours. This equates to an

@@ -12,7 +12,7 @@ const MenuButton = () => {
     >
       <summary
         className={classNames(
-          " btn bg-white swap swap-rotate w-full h-full z-10 border-none text-black hover:text-white",
+          " btn bg-white swap swap-rotate w-full h-full z-10 border-none text-black ",
           open ? "swap-active" : ""
         )}
       >
@@ -69,7 +69,9 @@ const MenuButton = () => {
         >
           Invest
         </Link>
-        <w3m-button balance="hide" />
+        <div className="w-full flex items-center justify-center">
+          <w3m-button balance="hide" />
+        </div>
       </nav>
     </details>
   );
