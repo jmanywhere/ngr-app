@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Image from "next/image";
-import barsAndLogo from "../../public/images/Image.png";
+import barsAndLogo from "../../public/images/heroimg.png";
 import barsAndGuy from "../../public/images/Image_1.png";
 import Logo from "../../public/Logo.png";
 
