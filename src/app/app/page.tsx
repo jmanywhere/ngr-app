@@ -8,14 +8,7 @@ const Page: NextPage = () => {
       <h1 className="text-black text-4xl font-bold pt-5 md:pt-10 uppercase pb-4">
         Investment
       </h1>
-      <div className="tabs tabs-boxed mb-5">
-        <Link href="/app" className="tab bg-secondary text-white text-xl">
-          Investor
-        </Link>
-        <Link href="/app/liquidators" className="tab text-white text-xl">
-          Liquidator
-        </Link>
-      </div>
+
       <section className="flex flex-col px-5 w-full items-center lg:px-10 pb-5 gap-4">
         <StatsCard />
       </section>

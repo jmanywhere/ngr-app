@@ -130,9 +130,10 @@ export default function LiquidationsTable() {
           <tbody className="text-white/70">
             {descPositions?.map((position, tableIndex) => {
               const currentAmount =
-                ((position.growAmount as bigint) * currentPrice) /
-                parseEther("1");
-              const split = currentAmount / 100n;
+                ((position.growAmount as bigint) * currentPrice * 96n) /
+                parseEther("100");
+              const maxLiq = (position.amountDeposited * 106n) / 100n;
+              const split = maxLiq / 100n + (currentAmount - maxLiq);
               const canLiquidate = position.liquidationPrice < currentPrice;
               if (position.isLiquidated) return null;
               return (

@@ -26,6 +26,7 @@ import {
   growConfig,
   usdtConfig,
 } from "@/data/contracts";
+import Link from "next/link";
 
 export const StatsCard = () => {
   const { address } = useAccount();
@@ -37,8 +38,9 @@ export const StatsCard = () => {
         args: [growToken],
       },
       {
-        ...ngrConfig,
-        functionName: "cycleCounter",
+        ...ngrGrowConfig,
+        functionName: "isLiquidator",
+        args: [address || zeroAddress],
       },
       {
         ...growConfig,
@@ -92,7 +94,7 @@ export const StatsCard = () => {
   const statsData = useMemo(() => {
     return {
       tcv: (ngrData?.[0].result as bigint) || 0n, // uint256 == bigint 1 ether == 1000000000000000000
-      cycleCounter: (ngrData?.[1].result as bigint) || 0n,
+      isLiquidator: ngrData?.[1].result || false,
       helixPrice: (ngrData?.[2].result as bigint) || 0n,
       liquidations: (ngrData?.[3].result as bigint) || 0n,
       totalPositions: (ngrData?.[4].result as bigint) || 0n,
@@ -114,6 +116,7 @@ export const StatsCard = () => {
         amountDeposited: bigint;
         growAmount: bigint;
         liquidationPrice: bigint;
+        liquidatedAmount: bigint;
         isLiquidated: boolean;
         early: boolean;
       }[],
@@ -127,9 +130,6 @@ export const StatsCard = () => {
   // });
 
   // const [selectedPage, setSelectedPage] = useState(0);
-
-  console.log(statsData.totalUserPositions);
-
   // const {
   //   data: positionsData,
   //   fetchNextPage,
@@ -172,10 +172,38 @@ export const StatsCard = () => {
     return () => clearInterval(interval);
   }, [fullRefetch]);
 
-  const totalPages = Math.ceil(statsData.totalUserPositions.length / 10);
+  const [showAll, setShowAll] = useState(false);
 
   return (
     <>
+      <div className="flex flex-col items-center">
+        {statsData.isLiquidator && (
+          <div className="px-2 w-full">
+            <div className="text-primary text-sm text-center bg-slate-600 px-2 py-1 rounded-t-2xl w-full uppercase">
+              Valid Liquidator
+            </div>
+          </div>
+        )}
+        <div className="tabs tabs-boxed mb-2">
+          <Link href="/app" className="tab bg-secondary text-white text-xl">
+            Investor
+          </Link>
+          <Link
+            href="/app/liquidators"
+            className={classNames(
+              "tab text-white text-xl",
+              statsData.isLiquidator
+                ? ""
+                : "text-white/20 rounded-l-none px-1 pointer-events-none"
+            )}
+            onClick={(e) =>
+              statsData.isLiquidator ? null : e.preventDefault()
+            }
+          >
+            Liquidator
+          </Link>
+        </div>
+      </div>
       <section className="flex flex-col gap-y-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Global Stats
@@ -293,10 +321,37 @@ export const StatsCard = () => {
           </div>
         </div> */}
       </section>
-      <section className="flex flex-col">
-        <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
-          My Positions
-        </h2>
+      <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
+        My Positions
+      </h2>
+      <section className="flex flex-col bg-slate-700/70 px-4 rounded-2xl pb-4">
+        <div className="form-control flex flex-row items-center justify-center">
+          <label className="label cursor-pointer">
+            <span
+              className={classNames(
+                "label-text  text-lg pr-4 w-[90px]",
+                showAll ? "text-white/20" : "text-white/80"
+              )}
+            >
+              Pending
+            </span>
+            <input
+              type="checkbox"
+              className="toggle toggle-secondary"
+              checked={showAll}
+              onChange={() => setShowAll((p) => !p)}
+            />
+            <span
+              className={classNames(
+                "label-text pl-4 text-lg w-[90px]",
+                showAll ? "text-white/80" : "text-white/20"
+              )}
+            >
+              All
+            </span>
+          </label>
+        </div>
+
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <table className="table table-zebra">
             <thead>
@@ -309,6 +364,8 @@ export const StatsCard = () => {
             </thead>
             <tbody>
               {statsData.userPositionsInfo?.map((positionInfo, index) => {
+                const isPending = !positionInfo.isLiquidated;
+                if (!showAll && !isPending) return null;
                 return (
                   <PositionRow
                     key={`position-${index}-page-${positionInfo.owner}`}
@@ -318,6 +375,13 @@ export const StatsCard = () => {
                     isEarlyWithdraw={positionInfo.early}
                     liquidatePrice={positionInfo.liquidationPrice}
                     isLiquidated={positionInfo.isLiquidated}
+                    liquidateAmount={
+                      positionInfo.liquidatedAmount ||
+                      (positionInfo.growAmount *
+                        positionInfo.liquidationPrice *
+                        96n) /
+                        parseEther("100")
+                    }
                     canLiquidate={
                       positionInfo.liquidationPrice < statsData.helixPrice
                     }
@@ -395,6 +459,7 @@ const PositionRow = (props: {
   positionIndex: number;
   depositAmount: bigint;
   liquidatePrice: bigint;
+  liquidateAmount: bigint;
   isLiquidated: boolean;
   isEarlyWithdraw: boolean;
   liqDuration?: string | null;
@@ -409,6 +474,7 @@ const PositionRow = (props: {
     liqDuration,
     liquidatePrice,
     canLiquidate,
+    liquidateAmount,
   } = props;
 
   const { config: prepExitConfig, error: prepExitError } =
@@ -463,9 +529,7 @@ const PositionRow = (props: {
         {isEarlyWithdraw ? (
           parseFloat(formatEther((depositAmount * 92n) / 100n)).toLocaleString()
         ) : isLiquidated ? (
-          parseFloat(
-            formatEther((depositAmount * 106n) / 100n)
-          ).toLocaleString()
+          parseFloat(formatEther(liquidateAmount)).toLocaleString()
         ) : canLiquidate ? (
           <button
             className={classNames(
