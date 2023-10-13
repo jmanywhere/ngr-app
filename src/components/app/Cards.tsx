@@ -94,7 +94,7 @@ export const StatsCard = () => {
   const statsData = useMemo(() => {
     return {
       tcv: (ngrData?.[0].result as bigint) || 0n, // uint256 == bigint 1 ether == 1000000000000000000
-      isLiquidator: ngrData?.[1].result || false,
+      isLiquidator: (ngrData?.[1].result || false) as boolean,
       helixPrice: (ngrData?.[2].result as bigint) || 0n,
       liquidations: (ngrData?.[3].result as bigint) || 0n,
       totalPositions: (ngrData?.[4].result as bigint) || 0n,
