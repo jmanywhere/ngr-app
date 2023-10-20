@@ -11,11 +11,12 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
 import formatDuration from "date-fns/formatDuration";
+import { BiSolidChevronDown } from "react-icons/bi";
 
 import {
   TEST_USDT_ADDRESS,
@@ -27,6 +28,7 @@ import {
   usdtConfig,
 } from "@/data/contracts";
 import Link from "next/link";
+import { useImmer } from "use-immer";
 
 export const StatsCard = () => {
   const { address } = useAccount();
@@ -78,8 +80,9 @@ export const StatsCard = () => {
         functionName: "totalDeposits",
       },
       {
-        ...ngrConfig,
-        functionName: "totalLiquidations",
+        ...ngrGrowConfig,
+        functionName: "getUserMainPositions",
+        args: [address || zeroAddress],
       },
       {
         ...ngrGrowConfig,
@@ -108,7 +111,7 @@ export const StatsCard = () => {
         bigint
       ],
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
-      totalLiquidations: (ngrData?.[10].result as bigint) || 0n,
+      userMainPositions: ngrData?.[10].result || [],
       userPositionsInfo: (ngrData?.[11].result || []) as readonly {
         owner: `0x${string}`;
         depositTime: bigint;
@@ -122,42 +125,6 @@ export const StatsCard = () => {
       }[],
     };
   }, [ngrData]);
-
-  // const { data: positionData, refetch: positionRefetch } = useContractRead({
-  //   ...ngrConfig,
-  //   functionName: "positions",
-  //   args: [statsData.userStats[6] || 0n],
-  // });
-
-  // const [selectedPage, setSelectedPage] = useState(0);
-  // const {
-  //   data: positionsData,
-  //   fetchNextPage,
-  //   refetch: positionsRefetch,
-  //   isLoading: positionsLoading,
-  // } = useContractInfiniteReads({
-  //   cacheKey: "user_positions_1",
-  //   ...paginatedIndexesConfig(
-  //     (index: number) => {
-  //       if (index >= statsData.totalUserPositions.length)
-  //         return [] as readonly any[];
-  //       const positionToGet =
-  //         statsData.totalUserPositions[parseInt(index.toString())];
-  //       return [
-  //         {
-  //           ...ngrGrowConfig,
-  //           functionName: "positions",
-  //           args: [positionToGet],
-  //         },
-  //       ];
-  //     },
-  //     {
-  //       start: statsData.totalUserPositions.length - 1,
-  //       perPage: 10,
-  //       direction: "decrement",
-  //     }
-  //   ),
-  // });
 
   const fullRefetch = useCallback(() => {
     ngrDataRefetch();
@@ -218,17 +185,6 @@ export const StatsCard = () => {
             </p>
             <p className="stat-desc text-slate-500">Total in USDT</p>
           </div>
-          {/* <div className="stat">
-            <p className="stat-title text-slate-400">Payouts</p>
-            <p className="stat-value">
-              {parseFloat(
-                formatEther(statsData.totalLiquidations)
-              ).toLocaleString()}
-            </p>
-            <p className="stat-desc text-slate-500">
-              Total Principal + Interest USDT
-            </p>
-          </div> */}
           <div className="stat">
             <p className="stat-title text-slate-400">Liquidations</p>
             <p className="stat-value">
@@ -258,15 +214,6 @@ export const StatsCard = () => {
             </p>
             <div className="stat-desc text-slate-500">Total Value USDT</div>
           </div>
-          {/* <div className="stat">
-            <p className="stat-title text-slate-400">Cycle</p>
-            <p className="stat-value">
-              {statsData.cycleCounter.toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-500">
-              Times Price has reset
-            </div>
-          </div> */}
         </div>
       </section>
       <ActionsCard refetchOther={fullRefetch} tcv={statsData.tcv} />
@@ -297,29 +244,6 @@ export const StatsCard = () => {
             <div className="stat-desc text-slate-400">USDT</div>
           </div>
         </div>
-        {/* <div className="stats stats-vertical md:stats-horizontal shadow text-accent bg-emerald-800 ">
-          <div className="stat">
-            <p className="stat-title text-slate-300">Total</p>
-            <p className="stat-value">
-              {statsData.userStats[3].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Total deposits</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Liquidations</p>
-            <p className="stat-value">
-              {statsData.userStats[4].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Total Liquidations</div>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-300">Last ID</p>
-            <p className="stat-value">
-              {statsData.userStats[6].toLocaleString()}
-            </p>
-            <div className="stat-desc text-slate-400">Position Liquidated</div>
-          </div>
-        </div> */}
       </section>
       <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
         My Positions
@@ -353,101 +277,7 @@ export const StatsCard = () => {
         </div>
 
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
-          <table className="table table-zebra">
-            <thead>
-              <tr>
-                <th>Position ID</th>
-                <th>Deposit</th>
-                <th>Liquidation</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {statsData.userPositionsInfo?.map((positionInfo, index) => {
-                const isPending = !positionInfo.isLiquidated;
-                if (!showAll && !isPending) return null;
-                return (
-                  <PositionRow
-                    key={`position-${index}-page-${positionInfo.owner}`}
-                    positionId={statsData.totalUserPositions[index]}
-                    positionIndex={index}
-                    depositAmount={positionInfo.amountDeposited}
-                    isEarlyWithdraw={positionInfo.early}
-                    liquidatePrice={positionInfo.liquidationPrice}
-                    isLiquidated={positionInfo.isLiquidated}
-                    liquidateAmount={
-                      positionInfo.liquidatedAmount ||
-                      (positionInfo.growAmount *
-                        positionInfo.liquidationPrice *
-                        96n) /
-                        parseEther("100")
-                    }
-                    canLiquidate={
-                      positionInfo.liquidationPrice < statsData.helixPrice
-                    }
-                    liqDuration={
-                      positionInfo.isLiquidated
-                        ? formatDuration(
-                            intervalToDuration({
-                              start:
-                                parseInt(positionInfo.depositTime.toString()) *
-                                1000,
-                              end:
-                                parseInt(positionInfo.liqTime.toString()) *
-                                1000,
-                            }),
-                            {
-                              format: ["days", "hours", "minutes", "seconds"],
-                            }
-                          ).replace(/days|hours|minutes|seconds/gi, (m) =>
-                            m.substring(0, 1)
-                          )
-                        : null
-                    }
-                  />
-                );
-              })}
-            </tbody>
-          </table>
-          {/* {statsData.totalUserPositions.length > 10 && (
-            <div className="flex flex-row items-center justify-between">
-              <button
-                className={classNames(
-                  "btn  btn-circle btn-secondary",
-                  selectedPage === totalPages - 1 ? "btn-disabled" : ""
-                )}
-                onClick={() => {
-                  if (
-                    selectedPage + 1 >
-                    (positionsData?.pages?.length || 0) - 1
-                  ) {
-                    fetchNextPage();
-                  }
-                  setSelectedPage((p) => p + 1);
-                }}
-              >
-                {"<"}
-              </button>
-              <div className="font-semibold">
-                {positionsLoading ? (
-                  <span className="loading loading-spinner text-white w-10 h-10" />
-                ) : (
-                  Math.ceil(statsData.totalUserPositions.length / 10) -
-                  selectedPage
-                )}{" "}
-                / {Math.ceil(statsData.totalUserPositions.length / 10)}
-              </div>
-              <button
-                className={classNames(
-                  "btn  btn-circle btn-secondary",
-                  selectedPage === 0 ? "btn-disabled" : ""
-                )}
-                onClick={() => setSelectedPage((p) => p - 1)}
-              >
-                {">"}
-              </button>
-            </div>
-          )} */}
+          <MainDepositCard />
         </div>
       </section>
     </>
@@ -456,7 +286,6 @@ export const StatsCard = () => {
 
 const PositionRow = (props: {
   positionId: bigint;
-  positionIndex: number;
   depositAmount: bigint;
   liquidatePrice: bigint;
   liquidateAmount: bigint;
@@ -467,7 +296,6 @@ const PositionRow = (props: {
 }) => {
   const {
     positionId: posId,
-    positionIndex,
     depositAmount,
     isLiquidated,
     isEarlyWithdraw,
@@ -800,5 +628,182 @@ export const ActionsCard = (props: {
         </button> */}
       </div>
     </>
+  );
+};
+
+const MainDepositCard = () => {
+  const { address } = useAccount();
+  const { data: userMainPositions } = useContractRead({
+    ...ngrGrowConfig,
+    functionName: "getUserMainPositions",
+    args: [address || zeroAddress],
+    watch: true,
+  });
+  const [selectedMainDeposit, setSelectedMainDeposit] = useImmer<Array<number>>(
+    []
+  );
+
+  return (
+    <table className="table table-zebra">
+      <thead>
+        <th>#</th>
+        <th>Deposit</th>
+        <th>Positions</th>
+        <th>Liquidation Start</th>
+        <td />
+      </thead>
+      <tbody>
+        {userMainPositions?.map((position, index) => {
+          const isOpen = selectedMainDeposit.includes(index);
+          return (
+            <Fragment key={`main-positions-${index}`}>
+              <tr key={`main-positions-${index}`}>
+                <td>{index + 1}</td>
+                <td className="text-right">
+                  {parseFloat(formatEther(position.mainDeposit)).toLocaleString(
+                    undefined,
+                    {
+                      maximumFractionDigits: 0,
+                    }
+                  )}
+                </td>
+                <td className="text-right">
+                  {(
+                    position.endPosition -
+                    position.startPosition +
+                    1n
+                  ).toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}
+                </td>
+                <td className="text-right">
+                  {parseFloat(
+                    formatEther(position.liquidationStartPrice)
+                  ).toLocaleString(undefined, {
+                    maximumFractionDigits: 6,
+                  })}
+                </td>
+                <td>
+                  <button
+                    className={classNames(
+                      "btn btn-circle btn-sm transition-all duration-300",
+                      isOpen ? "rotate-180" : ""
+                    )}
+                    onClick={() =>
+                      setSelectedMainDeposit((draft) => {
+                        const depositIndex = draft.indexOf(index);
+                        if (depositIndex === -1) draft.push(index);
+                        else draft.splice(depositIndex, 1);
+                      })
+                    }
+                  >
+                    <BiSolidChevronDown />
+                  </button>
+                </td>
+              </tr>
+              <tr className={"h-0 overflow-hidden"}>
+                <td className="h-0 p-0 bg-slate-500" />
+                <td
+                  colSpan={4}
+                  className={classNames(
+                    "bg-slate-600 p-0 overflow-hidden",
+                    isOpen ? "py-2" : ""
+                  )}
+                >
+                  <table
+                    className={classNames(
+                      "table table-zebra",
+                      isOpen ? "" : "hidden"
+                    )}
+                  >
+                    <thead className="text-primary-focus">
+                      <th>Position</th>
+                      <th>Amount</th>
+                      <th>Liquidation</th>
+                      <th />
+                    </thead>
+                    <PositionsTableBody
+                      open={isOpen}
+                      startPosition={position.startPosition - 1n}
+                      endPosition={position.endPosition}
+                    />
+                  </table>
+                </td>
+              </tr>
+              <tr />
+            </Fragment>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+};
+
+const PositionsTableBody = (props: {
+  open: boolean;
+  startPosition: bigint;
+  endPosition: bigint;
+}) => {
+  const { data: segmentedPositions, isLoading } = useContractRead({
+    ...ngrGrowConfig,
+    functionName: "getPositions",
+    args: [props.startPosition, props.endPosition - props.startPosition],
+    enabled: props.open,
+    scopeKey: `positions-${props.startPosition.toString()}-${props.endPosition.toString()}`,
+  });
+  const { data: currentPrice } = useContractRead({
+    ...growConfig,
+    functionName: "calculatePrice",
+    enabled: props.open,
+  });
+
+  console.log({ props, segmentedPositions });
+  return (
+    <tbody>
+      {!open || isLoading ? (
+        <tr>
+          <td colSpan={4}>
+            <div className="loading loading-bars loading-lg" />
+          </td>
+        </tr>
+      ) : (
+        segmentedPositions?.map((position, index) => {
+          return (
+            <PositionRow
+              key={`position-row-info-${props.startPosition}-${index}`}
+              positionId={props.startPosition + BigInt(index)}
+              depositAmount={position.amountDeposited}
+              isEarlyWithdraw={position.early}
+              liquidatePrice={position.liquidationPrice}
+              isLiquidated={position.isLiquidated}
+              liquidateAmount={
+                position.liquidatedAmount ||
+                (position.growAmount * position.liquidationPrice * 96n) /
+                  parseEther("100")
+              }
+              canLiquidate={
+                position.liquidationPrice <
+                (currentPrice || parseEther("1000000"))
+              }
+              liqDuration={
+                position.isLiquidated
+                  ? formatDuration(
+                      intervalToDuration({
+                        start: parseInt(position.depositTime.toString()) * 1000,
+                        end: parseInt(position.liqTime.toString()) * 1000,
+                      }),
+                      {
+                        format: ["days", "hours", "minutes", "seconds"],
+                      }
+                    ).replace(/days|hours|minutes|seconds/gi, (m) =>
+                      m.substring(0, 1)
+                    )
+                  : null
+              }
+            />
+          );
+        })
+      )}
+    </tbody>
   );
 };
