@@ -565,6 +565,47 @@ const abi = [
             "type":"address"
          }
       ],
+      "name":"getUserMainPositions",
+      "outputs":[
+         {
+            "components":[
+               {
+                  "internalType":"uint256",
+                  "name":"mainDeposit",
+                  "type":"uint256"
+               },
+               {
+                  "internalType":"uint256",
+                  "name":"liquidationStartPrice",
+                  "type":"uint256"
+               },
+               {
+                  "internalType":"uint256",
+                  "name":"startPosition",
+                  "type":"uint256"
+               },
+               {
+                  "internalType":"uint256",
+                  "name":"endPosition",
+                  "type":"uint256"
+               }
+            ],
+            "internalType":"struct NGR_with_Grow.UserPositions[]",
+            "name":"",
+            "type":"tuple[]"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"address",
+            "name":"_owner",
+            "type":"address"
+         }
+      ],
       "name":"getUserPositions",
       "outputs":[
          {
@@ -938,6 +979,21 @@ const abi = [
    },
    {
       "inputs":[
+         
+      ],
+      "name":"totalPaidToLiquidators",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
          {
             "internalType":"address",
             "name":"newOwner",
@@ -976,6 +1032,45 @@ const abi = [
             "internalType":"contract IERC20",
             "name":"",
             "type":"address"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"address",
+            "name":"",
+            "type":"address"
+         },
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "name":"userMainDeposits",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"mainDeposit",
+            "type":"uint256"
+         },
+         {
+            "internalType":"uint256",
+            "name":"liquidationStartPrice",
+            "type":"uint256"
+         },
+         {
+            "internalType":"uint256",
+            "name":"startPosition",
+            "type":"uint256"
+         },
+         {
+            "internalType":"uint256",
+            "name":"endPosition",
+            "type":"uint256"
          }
       ],
       "stateMutability":"view",
