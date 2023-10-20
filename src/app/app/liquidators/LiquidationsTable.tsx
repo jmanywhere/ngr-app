@@ -10,6 +10,7 @@ import { formatEther, parseEther } from "viem";
 import { useImmer } from "use-immer";
 import classNames from "classnames";
 import { current } from "immer";
+import { parse } from "path";
 
 export default function LiquidationsTable() {
   const [selectedIds, setSelectedIds] = useImmer<Array<number>>([]);
@@ -31,15 +32,26 @@ export default function LiquidationsTable() {
         ...ngrGrowConfig,
         functionName: "totalAmount",
       },
+      {
+        ...ngrGrowConfig,
+        functionName: "totalPaidToLiquidators",
+      },
     ],
     watch: true,
   });
 
-  const { currentPrice, queuePosition, liquidatorAmount, totalAmount } = {
+  const {
+    currentPrice,
+    queuePosition,
+    liquidatorAmount,
+    totalAmount,
+    totalPaidToLiquidators,
+  } = {
     currentPrice: (liquidationInfo?.[0].result || 0n) as bigint,
     queuePosition: (liquidationInfo?.[1].result || 0n) as bigint,
     liquidatorAmount: (liquidationInfo?.[2].result || 0n) as bigint,
     totalAmount: (liquidationInfo?.[3].result || 0n) as bigint,
+    totalPaidToLiquidators: (liquidationInfo?.[4].result || 0n) as bigint,
   };
 
   const { data: positions } = useContractRead({
@@ -60,7 +72,8 @@ export default function LiquidationsTable() {
     args: [selectedIds.map((id) => BigInt(id))],
     onSuccess: () => {
       setSelectedIds((draft) => {
-        draft = [];
+        const length = draft.length;
+        draft.splice(0, length);
       });
     },
   });
@@ -95,6 +108,16 @@ export default function LiquidationsTable() {
           {parseFloat(formatEther(currentPrice)).toLocaleString(undefined, {
             maximumFractionDigits: 6,
           })}
+        </span>
+        {"\n"}
+        <span className="text-sm">Paid to Liquidators:{"\n"}</span>
+        <span className="text-xl font-bold text-primary">
+          {parseFloat(formatEther(totalPaidToLiquidators)).toLocaleString(
+            undefined,
+            {
+              maximumFractionDigits: 6,
+            }
+          )}
         </span>
       </h2>
       <div className="w-full flex justify-center items-center py-2">
@@ -132,7 +155,9 @@ export default function LiquidationsTable() {
               const currentAmount =
                 ((position.growAmount as bigint) * currentPrice * 96n) /
                 parseEther("100");
-              const maxLiq = (position.amountDeposited * 106n) / 100n;
+              const maxLiq =
+                (position.growAmount * position.liquidationPrice * 96n) /
+                parseEther("100");
               const split = maxLiq / 100n + (currentAmount - maxLiq);
               const canLiquidate = position.liquidationPrice < currentPrice;
               if (position.isLiquidated) return null;
@@ -142,7 +167,7 @@ export default function LiquidationsTable() {
                   <td>
                     {parseFloat(
                       formatEther(position.growAmount || 0n)
-                    ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
                   </td>
                   <td>
                     {parseFloat(

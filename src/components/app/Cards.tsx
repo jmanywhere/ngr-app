@@ -248,8 +248,8 @@ export const StatsCard = () => {
       <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
         My Positions
       </h2>
-      <section className="flex flex-col bg-slate-700/70 px-4 rounded-2xl pb-4">
-        <div className="form-control flex flex-row items-center justify-center">
+      <section className="flex flex-col bg-slate-700/70 px-4 rounded-2xl py-4">
+        {/* <div className="form-control flex flex-row items-center justify-center">
           <label className="label cursor-pointer">
             <span
               className={classNames(
@@ -274,7 +274,7 @@ export const StatsCard = () => {
               All
             </span>
           </label>
-        </div>
+        </div> */}
 
         <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
           <MainDepositCard />
@@ -374,9 +374,7 @@ const PositionRow = (props: {
         )}
       </td>
       <td className={classNames("text-center")}>
-        {liqDuration ? (
-          "-"
-        ) : (
+        {liqDuration || (
           <button
             className={classNames(
               "btn btn-accent btn-xs",
@@ -724,7 +722,7 @@ const MainDepositCard = () => {
                     </thead>
                     <PositionsTableBody
                       open={isOpen}
-                      startPosition={position.startPosition - 1n}
+                      startPosition={position.startPosition}
                       endPosition={position.endPosition}
                     />
                   </table>
@@ -747,7 +745,7 @@ const PositionsTableBody = (props: {
   const { data: segmentedPositions, isLoading } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getPositions",
-    args: [props.startPosition, props.endPosition - props.startPosition],
+    args: [props.startPosition, props.endPosition - props.startPosition + 1n],
     enabled: props.open,
     scopeKey: `positions-${props.startPosition.toString()}-${props.endPosition.toString()}`,
   });
