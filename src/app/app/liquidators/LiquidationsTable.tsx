@@ -182,7 +182,7 @@ export default function LiquidationsTable() {
                   ((position.growAmount as bigint) * currentPrice * 96n) /
                   parseEther("100");
                 const maxLiq = (position.amountDeposited * 105n) / 100n;
-                const split = (currentAmount - maxLiq) / 2n;
+                const split = ((currentAmount - maxLiq) * 6n) / 10n;
                 const canLiquidate = position.liquidationPrice < currentPrice;
                 if (position.isLiquidated) return null;
                 return (
