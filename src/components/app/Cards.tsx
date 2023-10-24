@@ -468,7 +468,7 @@ export const ActionsCard = (props: {
       ? 25
       : tcv < parseEther("1000")
       ? 50
-      : parseInt(formatEther(tcv / 10n)) % 10;
+      : parseInt(formatEther(tcv / 10n));
 
   return (
     <>
@@ -524,7 +524,7 @@ export const ActionsCard = (props: {
             <>
               <span className="text-sm text-error">Min Deposit: 10 USDT</span>
               <span className="text-sm text-error">
-                Only multiples of 10 with a max of{" "}
+                Max of{" "}
                 {maxDeposit.toLocaleString(undefined, {
                   maximumFractionDigits: 0,
                 })}{" "}
