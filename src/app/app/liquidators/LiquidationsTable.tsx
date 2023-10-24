@@ -10,6 +10,7 @@ import { formatEther, parseEther } from "viem";
 import { useImmer } from "use-immer";
 import classNames from "classnames";
 import compact from "lodash/compact";
+import { useMemo } from "react";
 
 export default function LiquidationsTable() {
   const [selectedIds, setSelectedIds] = useImmer<Array<number>>([]);
@@ -70,7 +71,6 @@ export default function LiquidationsTable() {
     watch: true,
   });
 
-  console.log({ positions, currentPositionToLiquidate, liquidationInfo });
   const {
     data: liquidateData,
     write: liquidate,
@@ -115,6 +115,16 @@ export default function LiquidationsTable() {
       }>
     )?.reverse() || []
   );
+  const positionToLiquidate = useMemo(() => {
+    if (!positions) return NaN;
+    for (let i = 0; i < positions.length; i++) {
+      if (
+        positions[i].liquidationPrice >= currentPrice &&
+        !positions[i].isLiquidated
+      )
+        return i;
+    }
+  }, [positions, currentPrice]);
   return (
     <>
       <h2 className="text-xl text-center whitespace-pre-wrap bg-slate-800 w-full max-w-xs p-4 rounded-xl text-slate-300">
@@ -229,7 +239,12 @@ export default function LiquidationsTable() {
                   {"\n"}
                   Next Liquidation at:{" "}
                   {parseFloat(
-                    formatEther(positions?.[0].liquidationPrice || 0n)
+                    formatEther(
+                      (positionToLiquidate || -1) > -1
+                        ? positions?.[positionToLiquidate ?? 0]
+                            .liquidationPrice || 0n
+                        : 0n
+                    )
                   ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
                 </td>
               </tr>
