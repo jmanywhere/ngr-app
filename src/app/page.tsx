@@ -3,6 +3,7 @@ import Image from "next/image";
 import barsAndLogo from "../../public/images/heroimg.png";
 import barsAndGuy from "../../public/images/Image_1.png";
 import Logo from "../../public/Logo.png";
+import Link from "next/link";
 
 const Page: NextPage = () => {
   return (
@@ -27,9 +28,12 @@ const Page: NextPage = () => {
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 md:mb-12 lg:mb-16">
             Available on Binance Smart Chain. Other chains coming soon!
           </p>
-          <a href="" className="btn btn-primary capitalize text-black  px-6">
+          <Link
+            href="/app"
+            className="btn btn-primary capitalize text-black  px-6"
+          >
             Invest
-          </a>
+          </Link>
         </div>
       </section>
       <section className="bg-[#16171c] pt-20 pb-5 md:pb-14 lg:px-6 flex flex-col lg:flex-row lg:items-center w-full lg:justify-center">
