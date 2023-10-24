@@ -89,6 +89,11 @@ export const StatsCard = () => {
         functionName: "getUserPositionsInfo",
         args: [address || zeroAddress],
       },
+      {
+        ...ngrGrowConfig,
+        functionName: "autoReinvest",
+        args: [address || zeroAddress],
+      },
     ],
   });
 
@@ -110,6 +115,7 @@ export const StatsCard = () => {
         bigint,
         bigint
       ],
+      isAutoReinvesting: (ngrData?.[12].result || false) as boolean,
       totalDeposits: (ngrData?.[4].result as bigint) || 0n,
       userMainPositions: ngrData?.[10].result || [],
       userPositionsInfo: (ngrData?.[11].result || []) as readonly {
@@ -230,7 +236,11 @@ export const StatsCard = () => {
           </div>
         </div>
       </section>
-      <ActionsCard refetchOther={fullRefetch} tcv={statsData.tcv} />
+      <ActionsCard
+        refetchOther={fullRefetch}
+        tcv={statsData.tcv}
+        isAutoReinvesting={statsData.isAutoReinvesting}
+      />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
@@ -397,6 +407,7 @@ const PositionRow = (props: {
 
 export const ActionsCard = (props: {
   refetchOther: () => void;
+  isAutoReinvesting: boolean;
   tcv: bigint;
 }) => {
   const { refetchOther, tcv } = props;
@@ -436,13 +447,27 @@ export const ActionsCard = (props: {
       args: [parseEther(`${depositAmount}`), autoReinvest],
       onSuccess: refetchOther,
     });
+  const { config: reinvestConfig } = usePrepareContractWrite({
+    ...ngrGrowConfig,
+    functionName: "changeAutoReinvest",
+    args: [!autoReinvest],
+    onSuccess: refetchOther,
+  });
 
+  const { write: changeReinvest, data: reinvestData } = useContractWrite(
+    reinvestConfig || null
+  );
   const { write: deposit, data: depositData } = useContractWrite(
     depositConfig || null
   );
+
   const { write: approve, data: approveData } = useContractWrite(
     prepApproveConfig || null
   );
+  const { isLoading: reinvestLoading } = useWaitForTransaction({
+    hash: reinvestData?.hash,
+    confirmations: 5,
+  });
   const { isLoading: depositLoading } = useWaitForTransaction({
     hash: depositData?.hash,
     confirmations: 5,
@@ -463,12 +488,7 @@ export const ActionsCard = (props: {
     return () => clearInterval(interval);
   }, [usdtRefetch, address]);
 
-  const maxDeposit =
-    tcv < parseEther("500")
-      ? 25
-      : tcv < parseEther("1000")
-      ? 50
-      : parseInt(formatEther(tcv / 10n));
+  const maxDeposit = 25;
 
   return (
     <>
@@ -563,6 +583,25 @@ export const ActionsCard = (props: {
             the 6% profit target is met.{"\n"}Exiting before this automatic
             liquidation incurs a 8% penalty.
           </p>
+        </div>
+        <div className="flex flex-col items-center">
+          <h5>Is AutoReinvesting?</h5>
+          <div>
+            <input
+              type="checkbox"
+              className={classNames(
+                "toggle toggle-primary",
+                reinvestLoading ? "pointer-events-none" : ""
+              )}
+              checked={props.isAutoReinvesting}
+              onChange={() => {
+                changeReinvest?.();
+              }}
+            />
+            <span
+              className={reinvestLoading ? "loading loading-ring" : "hidden"}
+            />
+          </div>
         </div>
         {/* <button
           className={classNames(
