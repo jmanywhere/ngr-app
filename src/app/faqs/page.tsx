@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import QuestionDropdown from "@/components/faq/QuestionDropdown";
 
-import logo from "../../../public/images/Logo_1.png";
+import logo from "../../../public/growLogo.png";
 
 const Page: NextPage = () => {
   return (
