@@ -139,18 +139,32 @@ export const StatsCard = () => {
     return () => clearInterval(interval);
   }, [fullRefetch]);
 
-  const [showAll, setShowAll] = useState(false);
-
   return (
     <>
       <div className="flex flex-col items-center">
-        {statsData.isLiquidator && (
-          <div className="px-2 w-full">
+        <div className="px-2 w-full">
+          {statsData.isLiquidator ? (
             <div className="text-primary text-sm text-center bg-slate-600 px-2 py-1 rounded-t-2xl w-full uppercase">
               Valid Liquidator
             </div>
-          </div>
-        )}
+          ) : (
+            <>
+              <h4 className="text-center text-lg font-bold">
+                Liquidator Progress
+              </h4>
+              <p className="text-center text-xs text-black">
+                {parseInt(formatEther(statsData.userStats[0]))} / 50 USDT
+              </p>
+              <div className="main-progress h-6">
+                <progress
+                  className="w-full"
+                  value={parseInt(formatEther(statsData.userStats[0]))}
+                  max={50}
+                />
+              </div>
+            </>
+          )}
+        </div>
         <div className="tabs tabs-boxed mb-2">
           <Link href="/app" className="tab bg-secondary text-white text-xl">
             Investor
@@ -276,7 +290,7 @@ export const StatsCard = () => {
           </label>
         </div> */}
 
-        <div className="shadow text-slate-200 bg-slate-800 rounded-xl p-1 max-w-[100vw] overflow-x-auto">
+        <div className="shadow text-slate-200 bg-slate-800 rounded-xl pt-1 max-w-[100vw] overflow-x-auto">
           <MainDepositCard />
         </div>
       </section>
@@ -287,6 +301,7 @@ export const StatsCard = () => {
 const PositionRow = (props: {
   positionId: bigint;
   depositAmount: bigint;
+  growAmount: bigint;
   liquidatePrice: bigint;
   liquidateAmount: bigint;
   isLiquidated: boolean;
@@ -297,6 +312,7 @@ const PositionRow = (props: {
   const {
     positionId: posId,
     depositAmount,
+    growAmount,
     isLiquidated,
     isEarlyWithdraw,
     liqDuration,
@@ -313,26 +329,11 @@ const PositionRow = (props: {
       enabled: !isLiquidated,
     });
 
-  const { config: prepSelfLiqConfig, error: prepSelfLiqError } =
-    usePrepareContractWrite({
-      ...ngrGrowConfig,
-      functionName: "liquidateSelf",
-      args: [posId],
-      enabled: !isLiquidated && canLiquidate,
-    });
-
   const { write: exit, data: exitData } = useContractWrite(
     prepExitConfig || null
   );
-  const { write: selfLiquidate, data: selfLiqData } = useContractWrite(
-    prepSelfLiqConfig || null
-  );
   const { isLoading: exitLoading } = useWaitForTransaction({
     hash: exitData?.hash,
-    confirmations: 5,
-  });
-  const { isLoading: selfLiqLoading } = useWaitForTransaction({
-    hash: selfLiqData?.hash,
     confirmations: 5,
   });
 
@@ -340,9 +341,6 @@ const PositionRow = (props: {
     <tr>
       <td className="text-center font-bold">
         {posId?.toLocaleString() || "-"}
-      </td>
-      <td className="text-right">
-        {parseFloat(formatEther(depositAmount)).toLocaleString()}
       </td>
       <td
         className={classNames(
@@ -354,30 +352,36 @@ const PositionRow = (props: {
             : "text-white/80"
         )}
       >
-        {isEarlyWithdraw ? (
-          parseFloat(formatEther((depositAmount * 92n) / 100n)).toLocaleString()
-        ) : isLiquidated ? (
-          parseFloat(formatEther(liquidateAmount)).toLocaleString()
-        ) : canLiquidate ? (
-          <button
-            className={classNames(
-              "btn btn-secondary btn-xs",
-              selfLiqLoading ? "loading loading-spinner" : ""
-            )}
-            onClick={selfLiquidate}
-            disabled={selfLiqLoading}
-          >
-            Profit
-          </button>
-        ) : (
-          parseFloat(formatEther(liquidatePrice)).toLocaleString()
-        )}
+        {isEarlyWithdraw
+          ? parseFloat(
+              formatEther((depositAmount * 92n) / 100n)
+            ).toLocaleString()
+          : isLiquidated
+          ? parseFloat(formatEther(liquidateAmount)).toLocaleString()
+          : // canLiquidate ? (
+            //   <button
+            //     className={classNames(
+            //       "btn btn-secondary btn-xs",
+            //       selfLiqLoading ? "loading loading-spinner" : ""
+            //     )}
+            //     onClick={selfLiquidate}
+            //     disabled={selfLiqLoading}
+            //   >
+            //     Profit
+            //   </button>
+            // ) :
+
+            parseFloat(
+              formatEther(
+                (liquidatePrice * growAmount * 94n) / parseEther("100")
+              )
+            ).toLocaleString()}
       </td>
       <td className={classNames("text-center")}>
         {liqDuration || (
           <button
             className={classNames(
-              "btn btn-accent btn-xs",
+              "btn btn-warning btn-xs",
               exitLoading ? "loading loading-spinner" : ""
             )}
             onClick={exit}
@@ -415,7 +419,6 @@ export const ActionsCard = (props: {
   });
 
   const [depositAmount, setDepositAmount] = useState(0);
-  const [liquidateProfit, setLiquidateProfit] = useState(4);
   const [autoReinvest, setAutoReinvest] = useState(false);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
@@ -430,7 +433,7 @@ export const ActionsCard = (props: {
     usePrepareContractWrite({
       ...ngrGrowConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`), liquidateProfit, autoReinvest],
+      args: [parseEther(`${depositAmount}`), autoReinvest],
       onSuccess: refetchOther,
     });
 
@@ -461,10 +464,11 @@ export const ActionsCard = (props: {
   }, [usdtRefetch, address]);
 
   const maxDeposit =
-    tcv < parseEther("1000")
-      ? 100
-      : parseInt(formatEther(tcv / 10n)) -
-        (parseInt(formatEther(tcv / 10n)) % 10);
+    tcv < parseEther("500")
+      ? 25
+      : tcv < parseEther("1000")
+      ? 50
+      : parseInt(formatEther(tcv / 10n)) % 10;
 
   return (
     <>
@@ -515,58 +519,6 @@ export const ActionsCard = (props: {
             />
           </label>
           <div className="w-full h-[1px] bg-white/80 my-2" />
-          <div className="flex flex-row items-center gap-4 py-2">
-            <div className="flex flex-col items-center">
-              <input
-                type="radio"
-                name="profit"
-                className="radio radio-primary radio-sm"
-                checked={liquidateProfit == 4}
-                onChange={() => setLiquidateProfit(4)}
-              />
-              <label className="label label-text">4%</label>
-            </div>
-            <div className="flex flex-col items-center">
-              <input
-                type="radio"
-                name="profit"
-                className="radio radio-primary radio-sm"
-                checked={liquidateProfit == 5}
-                onChange={() => setLiquidateProfit(5)}
-              />
-              <label className="label label-text">5%</label>
-            </div>
-            <div className="flex flex-col items-center">
-              <input
-                type="radio"
-                name="profit"
-                className="radio radio-primary radio-sm"
-                checked={liquidateProfit == 6}
-                onChange={() => setLiquidateProfit(6)}
-              />
-              <label className="label label-text">6%</label>
-            </div>
-            <div className="flex flex-col items-center">
-              <input
-                type="radio"
-                name="profit"
-                className="radio radio-primary radio-sm"
-                checked={liquidateProfit == 7}
-                onChange={() => setLiquidateProfit(7)}
-              />
-              <label className="label label-text">7%</label>
-            </div>
-            <div className="flex flex-col items-center">
-              <input
-                type="radio"
-                name="profit"
-                className="radio radio-primary radio-sm"
-                checked={liquidateProfit == 8}
-                onChange={() => setLiquidateProfit(8)}
-              />
-              <label className="label label-text">8%</label>
-            </div>
-          </div>
           {((depositAmount < 10 ||
             (depositAmount > maxDeposit && isApproved)) && (
             <>
@@ -584,7 +536,7 @@ export const ActionsCard = (props: {
 
           <button
             className={classNames(
-              "btn w-full md:max-w-[300px]",
+              "btn w-full md:max-w-[300px] mt-2",
               isApproved ? "btn-primary" : "btn-secondary",
               (isApproved && prepDepositError) ||
                 depositLoading ||
@@ -607,9 +559,9 @@ export const ActionsCard = (props: {
         </div>
         <div className="flex flex-col items-center justify-center py-5 max-w-xs">
           <p className="text-xs whitespace-pre-line text-justify text-slate-400">
-            Deposits are automatically liquidated (principal and interest) when
+            Deposits are eligible for liquidation (principal and interest) when
             the 6% profit target is met.{"\n"}Exiting before this automatic
-            liquidation incurs a 6% penalty.
+            liquidation incurs a 8% penalty.
           </p>
         </div>
         {/* <button
@@ -646,8 +598,7 @@ const MainDepositCard = () => {
       <thead>
         <th>#</th>
         <th>Deposit</th>
-        <th>Positions</th>
-        <th>Liquidation Start</th>
+        <th className="text-right">Liquidate Price</th>
         <td />
       </thead>
       <tbody>
@@ -656,7 +607,11 @@ const MainDepositCard = () => {
           return (
             <Fragment key={`main-positions-${index}`}>
               <tr key={`main-positions-${index}`}>
-                <td>{index + 1}</td>
+                <td>
+                  {(position.positionId + 1n).toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}
+                </td>
                 <td className="text-right">
                   {parseFloat(formatEther(position.mainDeposit)).toLocaleString(
                     undefined,
@@ -664,15 +619,6 @@ const MainDepositCard = () => {
                       maximumFractionDigits: 0,
                     }
                   )}
-                </td>
-                <td className="text-right">
-                  {(
-                    position.endPosition -
-                    position.startPosition +
-                    1n
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}
                 </td>
                 <td className="text-right">
                   {parseFloat(
@@ -716,14 +662,13 @@ const MainDepositCard = () => {
                   >
                     <thead className="text-primary-focus">
                       <th>Position</th>
-                      <th>Amount</th>
-                      <th>Liquidation</th>
+                      <th>End Liquidation</th>
                       <th />
                     </thead>
                     <PositionsTableBody
                       open={isOpen}
-                      startPosition={position.startPosition}
-                      endPosition={position.endPosition}
+                      startPosition={position.positionId}
+                      endPosition={position.positionId}
                     />
                   </table>
                 </td>
@@ -771,6 +716,7 @@ const PositionsTableBody = (props: {
               key={`position-row-info-${props.startPosition}-${index}`}
               positionId={props.startPosition + BigInt(index)}
               depositAmount={position.amountDeposited}
+              growAmount={position.growAmount}
               isEarlyWithdraw={position.early}
               liquidatePrice={position.liquidationPrice}
               isLiquidated={position.isLiquidated}

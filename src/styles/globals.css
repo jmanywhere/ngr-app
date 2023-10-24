@@ -6,3 +6,16 @@ html{
   --scroll-behavior: smooth !important;
     scroll-behavior: smooth !important;
 }
+
+@layer components {
+  .main-progress{
+    @apply h-3;
+    appearance: none;
+    ::-webkit-progress-value{
+      @apply bg-primary rounded-full h-4;
+    }
+    ::-webkit-progress-bar{
+      @apply bg-slate-800 rounded-full h-4 p-1;
+    }
+  }
+}

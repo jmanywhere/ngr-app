@@ -9,8 +9,7 @@ import { growConfig, ngrGrowConfig } from "@/data/contracts";
 import { formatEther, parseEther } from "viem";
 import { useImmer } from "use-immer";
 import classNames from "classnames";
-import { current } from "immer";
-import { parse } from "path";
+import compact from "lodash/compact";
 
 export default function LiquidationsTable() {
   const [selectedIds, setSelectedIds] = useImmer<Array<number>>([]);
@@ -36,6 +35,10 @@ export default function LiquidationsTable() {
         ...ngrGrowConfig,
         functionName: "totalPaidToLiquidators",
       },
+      {
+        ...ngrGrowConfig,
+        functionName: "currentPositionToLiquidate",
+      },
     ],
     watch: true,
   });
@@ -46,8 +49,10 @@ export default function LiquidationsTable() {
     liquidatorAmount,
     totalAmount,
     totalPaidToLiquidators,
+    currentPositionToLiquidate,
   } = {
     currentPrice: (liquidationInfo?.[0].result || 0n) as bigint,
+    currentPositionToLiquidate: (liquidationInfo?.[5].result || 0n) as bigint,
     queuePosition: (liquidationInfo?.[1].result || 0n) as bigint,
     liquidatorAmount: (liquidationInfo?.[2].result || 0n) as bigint,
     totalAmount: (liquidationInfo?.[3].result || 0n) as bigint,
@@ -57,18 +62,22 @@ export default function LiquidationsTable() {
   const { data: positions } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getPositions",
-    args: [0n, queuePosition],
+    args: [
+      currentPositionToLiquidate,
+      queuePosition - currentPositionToLiquidate,
+    ],
     enabled: (queuePosition > 0n) as boolean,
     watch: true,
   });
 
+  console.log({ positions, currentPositionToLiquidate, liquidationInfo });
   const {
     data: liquidateData,
     write: liquidate,
     isLoading: loadingTxLiquidate,
   } = useContractWrite({
     ...ngrGrowConfig,
-    functionName: "liquidateOthers",
+    functionName: "liquidatePositions",
     args: [selectedIds.map((id) => BigInt(id))],
     onSuccess: () => {
       setSelectedIds((draft) => {
@@ -84,22 +93,28 @@ export default function LiquidationsTable() {
       confirmations: 5,
     });
 
-  const descPositions = (
-    positions?.map((position, index) => {
-      return { ...position, index };
-    }) as Array<{
-      owner: `0x${string}`;
-      depositTime: bigint;
-      liqTime: bigint;
-      amountDeposited: bigint;
-      growAmount: bigint;
-      liquidationPrice: bigint;
-      isLiquidated: boolean;
-      early: boolean;
-      index: number;
-    }>
-  )?.reverse();
-  const allPositions = positions?.length || 0;
+  const descPositions = compact(
+    (
+      positions?.map((position, index) => {
+        if (position.liquidationPrice > currentPrice || position.isLiquidated)
+          return null;
+        return {
+          ...position,
+          index: parseInt(currentPositionToLiquidate.toString()) + index,
+        };
+      }) as Array<{
+        owner: `0x${string}`;
+        depositTime: bigint;
+        liqTime: bigint;
+        amountDeposited: bigint;
+        growAmount: bigint;
+        liquidationPrice: bigint;
+        isLiquidated: boolean;
+        early: boolean;
+        index: number;
+      }>
+    )?.reverse() || []
+  );
   return (
     <>
       <h2 className="text-xl text-center whitespace-pre-wrap bg-slate-800 w-full max-w-xs p-4 rounded-xl text-slate-300">
@@ -151,63 +166,74 @@ export default function LiquidationsTable() {
             <th />
           </thead>
           <tbody className="text-white/70">
-            {descPositions?.map((position, tableIndex) => {
-              const currentAmount =
-                ((position.growAmount as bigint) * currentPrice * 96n) /
-                parseEther("100");
-              const maxLiq =
-                (position.growAmount * position.liquidationPrice * 96n) /
-                parseEther("100");
-              const split = maxLiq / 100n + (currentAmount - maxLiq);
-              const canLiquidate = position.liquidationPrice < currentPrice;
-              if (position.isLiquidated) return null;
-              return (
-                <tr key={`Liquidation-index-${position.index}`}>
-                  <th>{allPositions - tableIndex - 1}</th>
-                  <td>
-                    {parseFloat(
-                      formatEther(position.growAmount || 0n)
-                    ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
-                  </td>
-                  <td>
-                    {parseFloat(
-                      formatEther(position.liquidationPrice || 0n)
-                    ).toLocaleString(undefined, { maximumFractionDigits: 8 })}
-                  </td>
-                  <td>
-                    {position.isLiquidated || !canLiquidate
-                      ? "-"
-                      : parseFloat(formatEther(split)).toLocaleString(
-                          undefined,
-                          {
-                            maximumFractionDigits: 6,
-                          }
-                        )}
-                  </td>
-                  <td className="text-center">
-                    {canLiquidate && !position.isLiquidated ? (
-                      <input
-                        type="checkbox"
-                        className="checkbox checkbox-primary"
-                        checked={selectedIds.indexOf(position.index) > -1}
-                        onChange={() =>
-                          setSelectedIds((draft) => {
-                            const idIndex = draft.indexOf(position.index);
-                            if (idIndex > -1) {
-                              draft.splice(idIndex, 1);
-                            } else {
-                              draft.push(position.index);
+            {descPositions.length > 0 ? (
+              descPositions?.map((position, tableIndex) => {
+                const currentAmount =
+                  ((position.growAmount as bigint) * currentPrice * 96n) /
+                  parseEther("100");
+                const maxLiq = (position.amountDeposited * 105n) / 100n;
+                const split = (currentAmount - maxLiq) / 2n;
+                const canLiquidate = position.liquidationPrice < currentPrice;
+                if (position.isLiquidated) return null;
+                return (
+                  <tr key={`Liquidation-index-${position.index}`}>
+                    <th>{position.index}</th>
+                    <td>
+                      {parseFloat(
+                        formatEther(position.growAmount || 0n)
+                      ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                    </td>
+                    <td>
+                      {parseFloat(
+                        formatEther(position.liquidationPrice || 0n)
+                      ).toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                    </td>
+                    <td>
+                      {position.isLiquidated || !canLiquidate
+                        ? "-"
+                        : parseFloat(formatEther(split)).toLocaleString(
+                            undefined,
+                            {
+                              maximumFractionDigits: 6,
                             }
-                          })
-                        }
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                          )}
+                    </td>
+                    <td className="text-center">
+                      {canLiquidate && !position.isLiquidated ? (
+                        <input
+                          type="checkbox"
+                          className="checkbox checkbox-primary"
+                          checked={selectedIds.indexOf(position.index) > -1}
+                          onChange={() =>
+                            setSelectedIds((draft) => {
+                              const idIndex = draft.indexOf(position.index);
+                              if (idIndex > -1) {
+                                draft.splice(idIndex, 1);
+                              } else {
+                                draft.push(position.index);
+                              }
+                            })
+                          }
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={6} className="text-center whitespace-pre-wrap">
+                  No positions to liquidate
+                  {"\n"}
+                  Next Liquidation at:{" "}
+                  {parseFloat(
+                    formatEther(positions?.[0].liquidationPrice || 0n)
+                  ).toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
