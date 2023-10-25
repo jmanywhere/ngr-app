@@ -17,16 +17,19 @@ const Page: NextPage = () => {
             THE FIRST EVER FULLY COLLATERALIZED ACCELERATED ROI PLATFORM
           </h2>
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            6% ROI (134% APY)
+            5% ROI (100% APY)
           </p>
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
             Zero Ponzinomics
           </p>
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            Max Risk 6%
+            Max Risk 8%
+          </p>
+          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
+            Available on Binance Smart Chain. Other chains coming soon!
           </p>
           <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 md:mb-12 lg:mb-16">
-            Available on Binance Smart Chain. Other chains coming soon!
+            External revenue models in development
           </p>
           <Link
             href="/app"
@@ -49,75 +52,76 @@ const Page: NextPage = () => {
               Duration of each investment is brief (a few hours to a few weeks)
             </li>
             <li className="pb-2 text-sm md:text-base">
-              6% guaranteed return (approximately 134% APY)
+              Auto-reinvestment option to compound earnings and maximize APY
             </li>
-            {/* <li className="pb-2 text-sm md:text-base">
-              Auto-reinvestment option to maximize APY
-            </li> */}
             <li className="pb-2 text-sm md:text-base">Fully collateralized</li>
+            <li className="pb-2 text-sm md:text-base">Max risk is just 8%</li>
+            <li className="pb-2 text-sm md:text-base">Zero Ponzinomics</li>
             <li className="pb-2 text-sm md:text-base">
-              FIFO liquidation system
-            </li>
-            <li className="pb-2 text-sm md:text-base">Max risk just 6%</li>
-            <li className="pb-2 text-sm md:text-base">
-              Zero Ponzinomics - impossible to drain
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Benefits Small AND Large Investors, equally
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Innovative Corporate Restructure (CR) pricing strategy featuring
-              HELIX token
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Virtual Burn Technology (VBT), featuring Sparks
+              Whale proof and small investor friendly
             </li>
             <li className="pb-2 text-sm md:text-base">
               Price impact is always high because TCV is kept low
             </li>
-            <li className="text-sm md:text-base mb-8">
-              The same wallet can have multiple investments
+            <li className="pb-2 text-sm md:text-base">
+              Multiple investments from the same wallet
+            </li>
+            <li className="pb-2 text-sm md:text-base">
+              Frequent contract-embedded owner-funded buy & burns to constantly
+              boost price
+            </li>
+            <li className="pb-2 text-sm md:text-base">
+              Token price NEVER goes down
+            </li>
+            <li className="pb-2 text-sm md:text-base">
+              {" "}
+              Earn <strong>extra money</strong> by liquidating eligible
+              investments
             </li>
           </ol>
-          <a
-            href=""
+          <Link
+            href="/faqs"
             className="self-end btn btn-primary capitalize text-[black] rounded px-6 py-2"
           >
             Read More
-          </a>
+          </Link>
         </div>
       </section>
       <section className="flex flex-col items-center py-14 px-3">
         <Image src={Logo} alt="logo" className="pb-10" height={300} />
         <p className="text-center px-5 text-xs text-black font-medium lg:max-w-[1024px]">
-          NGR provides investors repeated returns of 6%. Each investment can
-          take a few weeks, a few days…or even a few hours. This equates to an
-          APY conservatively of approximately 134%. Profited liquidations can
-          occur VERY QUICKLY, so be sure to check your investments several times
-          per day. By reinvesting proceeds as soon as possible after
-          liquidation, compounded returns will be accelerated.
+          NGR provides investors repeated returns of 5%. Each investment can
+          take a few weeks, a few days…or even a few hours. This equates to a
+          potential APY of over 100%.
           <br />
-          <br /> NGR utilizes the fair and equitable FIFO (First In First Out)
-          system for automatically liquidating investors. <br />
-          <br /> Max risk is 6%. The only way to lose 6% is if an investor exits
-          NGR early before the 6% profit Liquidation Event (LE) is automatically
-          triggered. <br />
-          <br /> NGR is safe and effective for both small and large investors
-          alike. Each investor’s holdings are 100% collateralized by USDT, and
-          are entirely their own. There is no relying on Ponzinomics, miner
-          algorithms, gambling with the TCV, or other empty promises of a daily
-          return that is completely unsustainable at best, and outright
-          fraudulent at worst. <br />
-          <br /> HELIX will increase in price/value after EVERY transaction, and
-          exist in a never-ending loop between $1.00 and $1.20. Every time the
-          price hits $1.20, the price resets back to $1.00. This event is called
-          a Corporate Restructure (CR). <br />
-          <br /> Our Virtual Burn Technology (VBT) utilizes virtual tokens
-          (Sparks) which are burned at the beginning of every new cycle as new
-          investments are made. These burns create dramatic jumps in price, thus
-          accelerating the completion of each cycle. <br />
-          <br /> Want to invest more than $1,000 if that is the maximum? No
-          problem. Simply make multiple deposits from the same wallet.
+          NGR allows for auto-reinvestment of proceeds by simply checking a box
+          in the dApp. Maximize APY by taking advantage of this feature.
+          <br />
+          <br />
+          Max risk is 8%. The only way to lose 8% is to exit early before the
+          profit Liquidation Events (LE) are triggered.
+          <br />
+          <br />
+          NGR is safe and effective for both small and large investors alike.
+          Each investor&apos;s holdings are 100% collateralized by USDT, and are
+          entirely their own. There is no relying on Ponzinomics, miner
+          algorithms, or gambling with the TCV.
+          <br />
+          <br />
+          GROW will increase in price after EVERY transaction. The maximum
+          single investment in NGR is $25, the minimum is $10.
+          <br />
+          <br />
+          Each wallet can have unlimited individual investments.
+          <br />
+          <br />
+          NGR allows verified liquidators to liquidate pending profits in the
+          queue and receive a financial bonus for doing so.
+          <br />
+          <br />
+          NGR ownership is committed to investor success. NGR&apos;s corporate
+          wallet will do frequent buy &amp; burns to push the price higher and
+          higher. The more invested, the more burned.
         </p>
       </section>
     </main>

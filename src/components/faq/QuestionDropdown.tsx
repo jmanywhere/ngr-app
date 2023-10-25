@@ -1,4 +1,3 @@
-"use client";
 type questionProps = {
   question: String;
   ans: String;
@@ -12,7 +11,7 @@ const QuestionDropdown = (props: questionProps) => {
         {question}
       </summary>
       <div className="collapse-content text-white bg-slate-800/80  p-4">
-        <p>{ans}</p>
+        <p className="max-w-lg">{ans}</p>
       </div>
     </details>
   );

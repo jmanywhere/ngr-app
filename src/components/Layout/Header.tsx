@@ -27,14 +27,14 @@ const Header = () => {
         <a href="#TradingBot" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Trading Bot
         </a> */}
-          <a
-            href="#Socials"
+          <Link
+            href="/#Socials"
             className="btn btn-link no-underline font-light capitalize text-black px-3"
           >
             Socials
-          </a>
+          </Link>
           <a
-            href="#Audit"
+            href="/#Audit"
             className="btn btn-link no-underline font-light capitalize text-black px-3"
           >
             Audit
