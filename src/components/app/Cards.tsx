@@ -580,7 +580,7 @@ export const ActionsCard = (props: {
         <div className="flex flex-col items-center justify-center py-5 max-w-xs">
           <p className="text-xs whitespace-pre-line text-justify text-slate-400">
             Deposits are eligible for liquidation (principal and interest) when
-            the 6% profit target is met.{"\n"}Exiting before this automatic
+            the 5% profit target is met.{"\n"}Exiting before this automatic
             liquidation incurs a 8% penalty.
           </p>
         </div>

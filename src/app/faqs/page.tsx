@@ -11,7 +11,7 @@ const Page: NextPage = () => {
       <h1 className="text-[#012970] text-3xl font-bold py-5 md:py-10 center">
         Frequently Asked Questions
       </h1>
-      <section className="text-white/90 px-4 pt-4 pb-6 rounded-lg border-2 border-black flex flex-col md:flex-row md:justify-center md:gap-8 items-center bg-slate-800/80 mb-4 w-full md:max-w-[600px]">
+      {/* <section className="text-white/90 px-4 pt-4 pb-6 rounded-lg border-2 border-black flex flex-col md:flex-row md:justify-center md:gap-8 items-center bg-slate-800/80 mb-4 w-full md:max-w-[600px]">
         <Image
           src={logo}
           alt="NextGen Logo"
@@ -56,7 +56,7 @@ const Page: NextPage = () => {
             </li>
           </ul>
         </div>
-      </section>
+      </section> */}
       <section className=" pb-5">
         <div className="flex flex-col w-full items-center rounded-2xl border-2 border-black overflow-hidden">
           <QuestionDropdown
