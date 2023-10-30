@@ -34,8 +34,10 @@ const Header = () => {
             Socials
           </Link>
           <a
-            href="/#Audit"
+            href="https://github.com/CFG-NINJA/audits/blob/b78acd77bd2902c1bce6404f078ecf920c5d07a0/20231029_CFGNINJA_GrowToken_NGR_Audit.pdf"
             className="btn btn-link no-underline font-light capitalize text-black px-3"
+            target="_blank"
+            rel="noreferrer"
           >
             Audit
           </a>
