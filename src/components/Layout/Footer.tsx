@@ -24,7 +24,12 @@ const Footer = () => {
               >
                 Lottery
               </a>
-              <a href="#Audit" className="text-sm py-2">
+              <a
+                href="https://github.com/CFG-NINJA/audits/blob/b78acd77bd2902c1bce6404f078ecf920c5d07a0/20231029_CFGNINJA_GrowToken_NGR_Audit.pdf"
+                className="text-sm py-2"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Audit
               </a>
             </nav>
