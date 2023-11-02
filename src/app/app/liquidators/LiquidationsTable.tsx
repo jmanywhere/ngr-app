@@ -94,26 +94,24 @@ export default function LiquidationsTable() {
     });
 
   const descPositions = compact(
-    (
-      positions?.map((position, index) => {
-        if (position.liquidationPrice > currentPrice || position.isLiquidated)
-          return null;
-        return {
-          ...position,
-          index: parseInt(currentPositionToLiquidate.toString()) + index,
-        };
-      }) as Array<{
-        owner: `0x${string}`;
-        depositTime: bigint;
-        liqTime: bigint;
-        amountDeposited: bigint;
-        growAmount: bigint;
-        liquidationPrice: bigint;
-        isLiquidated: boolean;
-        early: boolean;
-        index: number;
-      }>
-    )?.reverse() || []
+    (positions?.map((position, index) => {
+      if (position.liquidationPrice > currentPrice || position.isLiquidated)
+        return null;
+      return {
+        ...position,
+        index: parseInt(currentPositionToLiquidate.toString()) + index,
+      };
+    }) as Array<{
+      owner: `0x${string}`;
+      depositTime: bigint;
+      liqTime: bigint;
+      amountDeposited: bigint;
+      growAmount: bigint;
+      liquidationPrice: bigint;
+      isLiquidated: boolean;
+      early: boolean;
+      index: number;
+    }>) || []
   );
   const positionToLiquidate = useMemo(() => {
     if (!positions) return NaN;
@@ -209,7 +207,12 @@ export default function LiquidationsTable() {
                           )}
                     </td>
                     <td className="text-center">
-                      {canLiquidate && !position.isLiquidated ? (
+                      {canLiquidate &&
+                      !position.isLiquidated &&
+                      (tableIndex == 0 ||
+                        selectedIds.includes(
+                          descPositions[tableIndex - 1].index
+                        )) ? (
                         <input
                           type="checkbox"
                           className="checkbox checkbox-primary"
@@ -217,8 +220,9 @@ export default function LiquidationsTable() {
                           onChange={() =>
                             setSelectedIds((draft) => {
                               const idIndex = draft.indexOf(position.index);
+                              const length = draft.length;
                               if (idIndex > -1) {
-                                draft.splice(idIndex, 1);
+                                draft.splice(idIndex, length - idIndex);
                               } else {
                                 draft.push(position.index);
                               }

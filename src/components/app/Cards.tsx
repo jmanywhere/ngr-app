@@ -97,8 +97,6 @@ export const StatsCard = () => {
     ],
   });
 
-  console.log(ngrData);
-
   const statsData = useMemo(() => {
     return {
       tcv: (ngrData?.[0].result as bigint) || 0n, // uint256 == bigint 1 ether == 1000000000000000000
@@ -526,18 +524,6 @@ export const ActionsCard = (props: {
               Max
             </button>
           </div>
-          <label className="label cursor-pointer">
-            <span className="label-text pr-2 font-bold text-white/90">
-              Auto reinvest
-            </span>
-            <input
-              type="radio"
-              name="reinvest"
-              className="radio radio-primary radio-sm"
-              checked={autoReinvest}
-              onChange={() => setAutoReinvest((p) => !p)}
-            />
-          </label>
           <div className="w-full h-[1px] bg-white/80 my-2" />
           {((depositAmount < 10 ||
             (depositAmount > maxDeposit && isApproved)) && (
