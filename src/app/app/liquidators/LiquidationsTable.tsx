@@ -123,7 +123,6 @@ export default function LiquidationsTable() {
         return i;
     }
   }, [positions, currentPrice]);
-  console.log({ positionToLiquidate, positions });
   return (
     <>
       <h2 className="text-xl text-center whitespace-pre-wrap bg-slate-800 w-full max-w-xs p-4 rounded-xl text-slate-300">
