@@ -207,7 +207,7 @@ export const StatsCard = () => {
                 { maximumFractionDigits: 2 }
               )}
             </p>
-            <p className="stat-desc text-slate-500">Total Liquidations Made</p>
+            <p className="stat-desc text-slate-500">Total USDT</p>
           </div>
         </div>
         <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
