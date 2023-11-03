@@ -404,7 +404,7 @@ export const ActionsCard = (props: {
   isAutoReinvesting: boolean;
   tcv: bigint;
 }) => {
-  const { refetchOther, tcv } = props;
+  const { refetchOther, tcv, isAutoReinvesting } = props;
   const { address } = useAccount();
   const { data: usdtBalance, refetch: usdtRefetch } = useContractReads({
     contracts: [
@@ -422,7 +422,6 @@ export const ActionsCard = (props: {
   });
 
   const [depositAmount, setDepositAmount] = useState(0);
-  const [autoReinvest, setAutoReinvest] = useState(false);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
     ...usdtConfig,
@@ -435,13 +434,13 @@ export const ActionsCard = (props: {
     usePrepareContractWrite({
       ...ngrGrowConfig,
       functionName: "deposit",
-      args: [parseEther(`${depositAmount}`), autoReinvest],
+      args: [parseEther(`${depositAmount}`), isAutoReinvesting],
       onSuccess: refetchOther,
     });
   const { config: reinvestConfig } = usePrepareContractWrite({
     ...ngrGrowConfig,
     functionName: "changeAutoReinvest",
-    args: [!autoReinvest],
+    args: [!isAutoReinvesting],
     onSuccess: refetchOther,
   });
 
