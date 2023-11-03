@@ -7,8 +7,8 @@ export const ngrContract = "0x0aC58925A4C668AB30d29fdBEC267A795d9f7891";
 export const TEST_USDT_ADDRESS = "0xb6d07d107ff8e26a21e497bf64c3239101fed3cf";
 export const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
-export const growNGR = "0xabAc06c3d1D3b4b97E2C76EaA22A979c895399f1";
-export const growToken = "0x06B4D0B693f3E063fCE4016b8C2Ac807605b65c9";
+export const growNGR = "0xCFaFe72b956b19D044722395B2564f8997941Af3";
+export const growToken = "0xA72f53ea4f3Cf19f1F6359E87E58221Bd0a7068b";
 
 export const ngrConfig = {
   address: ngrContract,

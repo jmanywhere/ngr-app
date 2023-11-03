@@ -1,11 +1,11 @@
 "use client";
 
 import { WagmiConfig } from "wagmi";
-import { bscTestnet, bsc } from "viem/chains";
+import { bsc } from "viem/chains";
 
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
-const chains = [bscTestnet];
+const chains = [bsc];
 const projectId = "5b3561f6a7c0319d2fcf6a9d20d6b1e8";
 
 const metadata = {
