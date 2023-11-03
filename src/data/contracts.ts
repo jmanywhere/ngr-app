@@ -16,7 +16,7 @@ export const ngrConfig = {
 } as const;
 
 export const usdtConfig = {
-  address: TEST_USDT_ADDRESS,
+  address: USDT_ADDRESS,
   abi: erc20ABI,
 } as const;
 

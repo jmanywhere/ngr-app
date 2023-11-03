@@ -1,10 +1,7 @@
 "use client";
 
 import {
-  erc20ABI,
-  paginatedIndexesConfig,
   useAccount,
-  useContractInfiniteReads,
   useContractRead,
   useContractReads,
   useContractWrite,
@@ -19,7 +16,6 @@ import formatDuration from "date-fns/formatDuration";
 import { BiSolidChevronDown } from "react-icons/bi";
 
 import {
-  TEST_USDT_ADDRESS,
   growNGR,
   growToken,
   ngrConfig,
@@ -413,14 +409,12 @@ export const ActionsCard = (props: {
   const { data: usdtBalance, refetch: usdtRefetch } = useContractReads({
     contracts: [
       {
-        address: TEST_USDT_ADDRESS,
-        abi: erc20ABI,
+        ...usdtConfig,
         functionName: "balanceOf",
         args: [address || zeroAddress],
       },
       {
-        address: TEST_USDT_ADDRESS,
-        abi: erc20ABI,
+        ...usdtConfig,
         functionName: "allowance",
         args: [address || zeroAddress, growNGR],
       },
@@ -431,8 +425,7 @@ export const ActionsCard = (props: {
   const [autoReinvest, setAutoReinvest] = useState(false);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
-    address: TEST_USDT_ADDRESS,
-    abi: erc20ABI,
+    ...usdtConfig,
     functionName: "approve",
     args: [growNGR, parseEther(`${1000000}`)],
     onSuccess: refetchOther,
