@@ -22,8 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${arimo.variable} bg-white font-arimo`}>
-        <Header />
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
         <Footer />
       </body>
     </html>
