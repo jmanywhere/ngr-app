@@ -2,6 +2,7 @@ import Image from "next/image";
 import logo from "../../../public/Logo.png";
 import Link from "next/link";
 import MenuButton from "./MenuButton";
+import ConnectKitBtn from "./ConnectKitBtn";
 
 const Header = () => {
   return (
@@ -49,7 +50,8 @@ const Header = () => {
           </Link>
         </nav>
         <div className="hidden md:block">
-          <w3m-button balance="hide" />
+          <ConnectKitBtn showAvatar={false} />
+          {/* <w3m-button balance="hide" /> */}
         </div>
         <MenuButton />
       </div>
