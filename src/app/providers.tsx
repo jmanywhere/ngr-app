@@ -6,7 +6,7 @@ import { bsc } from "viem/chains";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
 const chains = [bsc];
-const projectId = "5b3561f6a7c0319d2fcf6a9d20d6b1e8";
+const projectId = "0499684465a8ff62ec58d6f0e7bb2d66";
 
 const metadata = {
   name: "NextGen ROI",
