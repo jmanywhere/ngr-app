@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import classNames from "classnames";
+import ConnectKitBtn from "./ConnectKitBtn";
 
 const MenuButton = () => {
   const [open, setOpen] = useState(false);
@@ -72,7 +73,8 @@ const MenuButton = () => {
           Invest
         </Link>
         <div className="w-full flex items-center justify-center">
-          <w3m-button balance="hide" />
+          <ConnectKitBtn showAvatar={false} />
+          {/* <w3m-button balance="hide" /> */}
         </div>
       </nav>
     </details>
