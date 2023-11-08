@@ -33,7 +33,7 @@ import {
 import Link from "next/link";
 import { useImmer } from "use-immer";
 
-export const StatsCard = (props: { children: ReactNode }) => {
+export const StatsCard = (props: { liquidationDeposits: string }) => {
   const { address } = useAccount();
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
@@ -145,7 +145,6 @@ export const StatsCard = (props: { children: ReactNode }) => {
     }, 10000);
     return () => clearInterval(interval);
   }, [fullRefetch]);
-
   return (
     <>
       <div className="flex flex-col items-center">
@@ -199,7 +198,13 @@ export const StatsCard = (props: { children: ReactNode }) => {
         <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
           <div className="stat">
             <p className="stat-title text-slate-400">Investments</p>
-            <p className="stat-value">{props.children}</p>
+            <p className="stat-value">
+              {parseFloat(
+                formatEther(
+                  statsData.totalDeposits + BigInt(props.liquidationDeposits)
+                )
+              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </p>
             <p className="stat-desc text-slate-500">Total in USDT</p>
           </div>
           <div className="stat">
@@ -619,7 +624,7 @@ const MainDepositCard = () => {
         <th>#</th>
         <th>Deposit</th>
         <th className="text-right">Liquidate Price</th>
-        <td />
+        <th />
       </thead>
       <tbody>
         {userMainPositions?.map((position, index) => {

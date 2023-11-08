@@ -13,7 +13,7 @@ myHeaders.append("X-API-KEY", process.env.BITQUERY_API);
 
 const raw = JSON.stringify({
   query:
-    'query MyQuery {\n  EVM(network: bsc, dataset: combined) {\n    Events(\n      where: {Log: {SmartContract: {is: "0xCFaFe72b956b19D044722395B2564f8997941Af3"}, Signature: {Name: {is: "Deposit"}}}}\n    ) {\n      Arguments {\n        Name\n        Index\n        Value {\n          ... on EVM_ABI_BigInt_Value_Arg {\n            bigInteger\n          }\n        }\n      }\n    }\n  }\n}\n',
+    'query MyQuery {\n  EVM(network: bsc, dataset: combined) {\n    Events(\n      where: {Log: {SmartContract: {is: "0xCFaFe72b956b19D044722395B2564f8997941Af3"}, Signature: {Name: {is: "Deposit"}}}, Call: {Signature: {Name: {is: "liquidatePositions"}}}}\n    ) {\n      Arguments {\n        Name\n        Index\n        Value {\n          ... on EVM_ABI_BigInt_Value_Arg {\n            bigInteger\n          }\n        }\n      }\n    }\n  }\n}\n',
   variables: "{}",
 });
 
@@ -30,7 +30,7 @@ async function fetchRawGraphQl() {
   const totalDeposits = data.reduce((acc: bigint, curr: any) => {
     const deposit = BigInt(curr.Arguments[2].Value.bigInteger);
     return acc + deposit;
-  }, 0n);
+  }, 0n) as bigint;
   return totalDeposits.toString();
 }
 
@@ -43,11 +43,7 @@ const Page: NextPage = async () => {
       </h1>
 
       <section className="flex flex-col px-5 w-full items-center lg:px-10 pb-5 gap-4">
-        <StatsCard>
-          {parseFloat(formatEther(depositData)).toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })}
-        </StatsCard>
+        <StatsCard liquidationDeposits={depositData} />
       </section>
     </main>
   );
