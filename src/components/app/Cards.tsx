@@ -8,7 +8,14 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import classNames from "classnames";
 import intervalToDuration from "date-fns/intervalToDuration";
@@ -26,7 +33,7 @@ import {
 import Link from "next/link";
 import { useImmer } from "use-immer";
 
-export const StatsCard = () => {
+export const StatsCard = (props: { children: ReactNode }) => {
   const { address } = useAccount();
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
@@ -192,11 +199,7 @@ export const StatsCard = () => {
         <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
           <div className="stat">
             <p className="stat-title text-slate-400">Investments</p>
-            <p className="stat-value">
-              {parseFloat(
-                formatEther(statsData.totalDeposits)
-              ).toLocaleString()}
-            </p>
+            <p className="stat-value">{props.children}</p>
             <p className="stat-desc text-slate-500">Total in USDT</p>
           </div>
           <div className="stat">
@@ -717,7 +720,6 @@ const PositionsTableBody = (props: {
     enabled: props.open,
   });
 
-  console.log({ props, segmentedPositions });
   return (
     <tbody>
       {!open || isLoading ? (
