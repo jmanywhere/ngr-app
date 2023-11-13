@@ -102,7 +102,7 @@ const Page: NextPage = () => {
           <QuestionDropdown
             question={"Is NGR just a fancy miner"}
             ans={
-              "NO!  There is no “communal pot”, no “miner algorithm”, and no relying on unrealistic expectations of a certain yield per day that promises to pay out more than actually exists in the TCV.  100% of miners and any token that guarantees a certain yield per day is a Ponzi scheme and unsustainable."
+              "NO!  There is no “communal pot”, no “miner algorithm”, and no relying on unrealistic expectations of a certain yield per day that promises to pay out more than actually exists in the TCV."
             }
           />
           <QuestionDropdown
