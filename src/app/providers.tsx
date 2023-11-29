@@ -1,14 +1,14 @@
 "use client";
 
 import { WagmiConfig, createConfig } from "wagmi";
-import { bsc } from "viem/chains";
+import { bsc, bscTestnet } from "viem/chains";
 import {
   ConnectKitProvider,
   ConnectKitButton,
   getDefaultConfig,
 } from "connectkit";
 
-const chains = [bsc];
+const chains = [bsc, bscTestnet];
 const projectId = "0499684465a8ff62ec58d6f0e7bb2d66";
 
 const metadata = {

@@ -148,6 +148,28 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
   return (
     <>
       <div className="flex flex-col items-center">
+        <div className="tabs tabs-boxed mb-2">
+          <Link
+            href="/invest/fixed"
+            className="tab bg-secondary text-white text-xl"
+          >
+            Investor
+          </Link>
+          <Link
+            href="/invest/fixed/liquidators"
+            className={classNames(
+              "tab text-white text-xl"
+              // statsData.isLiquidator
+              //   ? ""
+              //   : "text-white/20 rounded-l-none px-1 pointer-events-none"
+            )}
+            // onClick={(e) =>
+            //   statsData.isLiquidator ? null : e.preventDefault()
+            // }
+          >
+            Liquidator
+          </Link>
+        </div>
         <div className="px-2 w-full">
           {statsData.isLiquidator ? (
             <div className="text-primary text-sm text-center bg-slate-600 px-2 py-1 rounded-t-2xl w-full uppercase">
@@ -170,25 +192,6 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
               </div>
             </>
           )}
-        </div>
-        <div className="tabs tabs-boxed mb-2">
-          <Link href="/app" className="tab bg-secondary text-white text-xl">
-            Investor
-          </Link>
-          <Link
-            href="/app/liquidators"
-            className={classNames(
-              "tab text-white text-xl",
-              statsData.isLiquidator
-                ? ""
-                : "text-white/20 rounded-l-none px-1 pointer-events-none"
-            )}
-            onClick={(e) =>
-              statsData.isLiquidator ? null : e.preventDefault()
-            }
-          >
-            Liquidator
-          </Link>
         </div>
       </div>
       <section className="flex flex-col gap-y-4">
