@@ -43,7 +43,7 @@ const Header = () => {
             Audit
           </a>
           <Link
-            href="/app"
+            href="/invest"
             className="text-black px-6 btn-primary btn text-sm font-medium capitalize"
           >
             Invest

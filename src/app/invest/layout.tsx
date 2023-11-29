@@ -6,7 +6,7 @@ export default function InvestLayout(props: { children: ReactNode }) {
     <div className="bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 pt-[75px] min-h-[calc(100vh-439px)] md:min-h-[calc(100vh-303px)]">
       <div className="flex flex-col items-center py-4">
         <h1 className="text-2xl md:text-4xl font-bold uppercase text-center">
-          Next Gen Investments
+          Next Gen ROI
         </h1>
         <div className="tabs tabs-boxed mb-2">
           <Link

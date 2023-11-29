@@ -37,7 +37,17 @@ const abi = [
   },
   {
     "inputs": [],
+    "name": "GrowDrip__InvalidOperation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "GrowDrip__OnlyOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GrowDrip__ZeroLiquidation",
     "type": "error"
   },
   {
@@ -315,6 +325,19 @@ const abi = [
   },
   {
     "inputs": [],
+    "name": "becomeLiquidatorThreshold",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "claim",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -337,6 +360,11 @@ const abi = [
       },
       {
         "internalType": "uint256",
+        "name": "tokensToReceive",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "growToBurn",
         "type": "uint256"
       }
@@ -355,6 +383,25 @@ const abi = [
     "name": "deposit",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "feeExemption",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -384,6 +431,25 @@ const abi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "liquidatorEarnings",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -394,6 +460,31 @@ const abi = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "quit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_who",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_status",
+        "type": "bool"
+      }
+    ],
+    "name": "setFeeExemptStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -410,26 +501,34 @@ const abi = [
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "totalClaimed",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "_liquidator",
-        "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "_valid",
-        "type": "bool"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "setValidLiquidator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "totalDeposits",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalLiquidated",
     "outputs": [
       {
         "internalType": "uint256",
@@ -498,32 +597,13 @@ const abi = [
     "outputs": [
       {
         "internalType": "address[]",
-        "name": "usersPendingLiquidation",
+        "name": "pendingLiquidation",
         "type": "address[]"
       },
       {
         "internalType": "uint256[]",
         "name": "rewardAmounts",
         "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "validLiquidator",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
