@@ -113,9 +113,23 @@ export default function DripActions() {
     confirmations: 5,
   });
 
-  const hasAllowance = (userInfo?.[1].result || 0n) > parseEther("100");
+  const hasAllowance =
+    ((userInfo?.[1].result || 0n) as bigint) > parseEther("100");
   const action1Loading =
     approveLoading || approveTxLoading || depositLoading || depositTxLoading;
+
+  const userInfoParsed = {
+    //@ts-ignore
+    usdtBalance: userInfo?.[0].result as bigint | undefined,
+    //@ts-ignore
+    allowance: userInfo?.[1].result as bigint | undefined,
+    //@ts-ignore
+    claimable: userInfo?.[2].result?.[1] as bigint | undefined,
+    user: {
+      //@ts-ignore
+      deposits: userInfo?.[3].result?.[0] || (0n as bigint),
+    },
+  };
 
   return (
     <div className="text-white/90 px-4 py-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 max-w-[90vw]">
@@ -141,7 +155,7 @@ export default function DripActions() {
             <label className="label">
               <span className="label-text-alt">Wallet:</span>
               <span className="label-text-alt">
-                {formatTokens(userInfo?.[0].result)} USDT
+                {formatTokens(userInfoParsed.usdtBalance)} USDT
               </span>
             </label>
           </div>
@@ -186,7 +200,7 @@ export default function DripActions() {
           <div className="stat">
             <p className="stat-title text-center">Claimable</p>
             <p className="stat-value text-center">
-              {formatTokens(userInfo?.[2].result?.[1], 4)}
+              {formatTokens(userInfoParsed.claimable, 4)}
             </p>
             <p className="stat-desc text-center">USDT</p>
           </div>
@@ -194,7 +208,7 @@ export default function DripActions() {
           <button
             className="btn btn-secondary min-w-[200px] rounded-xl"
             disabled={
-              (userInfo?.[2].result?.[1] || 0n) == 0n ||
+              userInfoParsed.user.deposits == 0n ||
               claimLoading ||
               claimTxLoading
             }
@@ -208,7 +222,7 @@ export default function DripActions() {
           </button>
         </div>
       </div>
-      {(userInfo?.[3]?.result?.[0] || 0n) > 0n ? (
+      {userInfoParsed.user.deposits > 0n ? (
         <div className="collapse collapse-arrow max-w-[280px]">
           <input type="checkbox" name="quit-collapse" id="quit-collapse" />
           <div className="text-lg font-bold text-error collapse-title block">
