@@ -33,7 +33,7 @@ import {
 import Link from "next/link";
 import { useImmer } from "use-immer";
 
-export const StatsCard = (props: { liquidationDeposits: string }) => {
+export const StatsCard = () => {
   const { address } = useAccount();
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
@@ -198,29 +198,6 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Global Stats
         </h2>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
-          <div className="stat">
-            <p className="stat-title text-slate-400">Investments</p>
-            <p className="stat-value">
-              {parseFloat(
-                formatEther(
-                  statsData.totalDeposits + BigInt(props.liquidationDeposits)
-                )
-              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </p>
-            <p className="stat-desc text-slate-500">Total in USDT</p>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-400">Liquidations</p>
-            <p className="stat-value">
-              {parseFloat(formatEther(statsData.liquidations)).toLocaleString(
-                undefined,
-                { maximumFractionDigits: 2 }
-              )}
-            </p>
-            <p className="stat-desc text-slate-500">Total USDT</p>
-          </div>
-        </div>
         <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
           <div className="stat">
             <p className="stat-title text-slate-400">GROW Price</p>
@@ -241,11 +218,6 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
           </div>
         </div>
       </section>
-      <ActionsCard
-        refetchOther={fullRefetch}
-        tcv={statsData.tcv}
-        isAutoReinvesting={statsData.isAutoReinvesting}
-      />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
@@ -274,6 +246,12 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
           </div>
         </div>
       </section>
+      <ActionsCard
+        refetchOther={fullRefetch}
+        tcv={statsData.tcv}
+        isAutoReinvesting={statsData.isAutoReinvesting}
+      />
+
       <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
         My Positions
       </h2>
