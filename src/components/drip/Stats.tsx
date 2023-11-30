@@ -15,12 +15,17 @@ export default function DripStats() {
         ...dripGrowConfig,
         functionName: "totalClaimed",
       },
+      {
+        ...dripGrowConfig,
+        functionName: "activeDeposits",
+      },
     ],
     watch: true,
   });
   const statsData = {
     deposits: statData?.[0].result as bigint | undefined,
     claimed: statData?.[1].result as bigint | undefined,
+    activeDeposits: statData?.[2].result as bigint | undefined,
   };
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-accent">
@@ -32,7 +37,7 @@ export default function DripStats() {
       <div className="stat">
         <p className="stat-title">Daily Payouts</p>
         <p className="stat-value">
-          {formatTokens(((statsData.deposits || 0n) * 5n) / 100_0n, 2)}
+          {formatTokens(((statsData.activeDeposits || 0n) * 5n) / 100_0n, 2)}
         </p>
         <p className="stat-desc">USDT</p>
       </div>

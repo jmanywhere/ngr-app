@@ -42,6 +42,11 @@ const abi = [
   },
   {
     "inputs": [],
+    "name": "GrowDrip__MinInitDepositNotMet",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "GrowDrip__OnlyOwner",
     "type": "error"
   },
@@ -318,6 +323,19 @@ const abi = [
         "internalType": "contract IERC20",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "activeDeposits",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
