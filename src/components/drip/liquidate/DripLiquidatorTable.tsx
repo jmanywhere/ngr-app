@@ -32,7 +32,10 @@ export default function DripLiquidatorTable() {
     write: liquidate,
     data: liquidateData,
     isLoading: liquidateLoading,
-  } = useContractWrite(liquidateConfig);
+  } = useContractWrite({
+    ...liquidateConfig,
+    onSuccess: () => setSelectedIds(() => []),
+  });
   const { isLoading: liquidateTxLoading } = useWaitForTransaction({
     hash: liquidateData?.hash,
   });

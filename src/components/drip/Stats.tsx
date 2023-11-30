@@ -133,7 +133,7 @@ export function DripUserStats() {
         </div>
         <div className="stat">
           <p className="stat-title text-slate-300">Liq. Rewards</p>
-          <p className="stat-value">{formatTokens(liquidatorEarnings)}</p>
+          <p className="stat-value">{formatTokens(liquidatorEarnings, 3)}</p>
           <p className="stat-desc">USDT</p>
         </div>
       </div>
