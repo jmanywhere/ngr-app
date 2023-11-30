@@ -10,6 +10,12 @@ export default function InvestLayout(props: { children: ReactNode }) {
         </h1>
         <div className="tabs tabs-boxed mb-2">
           <Link
+            href="/invest"
+            className="tab hover:bg-accent text-white hover:text-black text-md sm:text-xl w-[120px] sm:w-[180px]"
+          >
+            Stats
+          </Link>
+          <Link
             href="/invest/fixed"
             className="tab hover:bg-secondary text-white text-md sm:text-xl w-[120px] sm:w-[180px]"
           >
