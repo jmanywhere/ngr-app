@@ -12,7 +12,7 @@ export const growNGR = "0xCFaFe72b956b19D044722395B2564f8997941Af3";
 export const growToken = "0xA72f53ea4f3Cf19f1F6359E87E58221Bd0a7068b";
 
 export const dripNGR = "0x3E3c85252d526f892860c17b87a6Ef1E011Afb9D";
-const growTestToken = "0x8d7a41cf742D0B6F1f6A32fAd8045a8D4384Ad09"
+export const growTestToken = "0x8d7a41cf742D0B6F1f6A32fAd8045a8D4384Ad09"
 
 export const ngrConfig = {
   address: ngrContract,

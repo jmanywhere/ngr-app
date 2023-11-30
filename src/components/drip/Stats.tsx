@@ -1,5 +1,10 @@
 "use client";
-import { dripGrowConfig, growConfig, testGrowConfig } from "@/data/contracts";
+import {
+  dripGrowConfig,
+  dripNGR,
+  growConfig,
+  testGrowConfig,
+} from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import { useAccount, useContractReads } from "wagmi";
@@ -19,6 +24,11 @@ export default function DripStats() {
         ...dripGrowConfig,
         functionName: "activeDeposits",
       },
+      {
+        ...testGrowConfig,
+        functionName: "balanceOf",
+        args: [dripNGR],
+      },
     ],
     watch: true,
   });
@@ -26,6 +36,7 @@ export default function DripStats() {
     deposits: statData?.[0].result as bigint | undefined,
     claimed: statData?.[1].result as bigint | undefined,
     activeDeposits: statData?.[2].result as bigint | undefined,
+    growInDrip: statData?.[3].result as bigint | undefined,
   };
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-accent">
@@ -45,6 +56,11 @@ export default function DripStats() {
         <p className="stat-title">Total Claimed</p>
         <p className="stat-value">{formatTokens(statsData.claimed, 4)}</p>
         <p className="stat-desc">USDT</p>
+      </div>
+      <div className="stat">
+        <p className="stat-title">Total</p>
+        <p className="stat-value">{formatTokens(statsData.growInDrip, 4)}</p>
+        <p className="stat-desc">GROW</p>
       </div>
     </div>
   );
@@ -133,14 +149,14 @@ export function DripUserStats() {
           <p className="stat-desc text-slate-300">USDT</p>
         </div>
         <div className="stat">
-          <p className="stat-title text-slate-300">Daily Claim</p>
+          <p className="stat-title text-slate-300">Max Daily</p>
           <p className="stat-value">
             {formatTokens(((deposits || 0n) * 5n) / 1000n, 2)}
           </p>
           <p className="stat-desc">USDT</p>
         </div>
         <div className="stat">
-          <p className="stat-title text-slate-300">Max Claimable</p>
+          <p className="stat-title text-slate-300">Current Max Value</p>
           <p className="stat-value">
             {formatTokens(
               ((growAmount || 0n) * maxUSDTClaimable) /
