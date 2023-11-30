@@ -124,7 +124,7 @@ export default function DripActions() {
     //@ts-ignore
     allowance: userInfo?.[1].result as bigint | undefined,
     //@ts-ignore
-    claimable: userInfo?.[2].result?.[1] as bigint | undefined,
+    claimable: userInfo?.[2].result?.[0] as bigint | undefined,
     user: {
       //@ts-ignore
       deposits: userInfo?.[3].result?.[0] || (0n as bigint),
