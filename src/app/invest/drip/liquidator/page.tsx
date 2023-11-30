@@ -1,3 +1,4 @@
+import DripLiquidatorTable from "@/components/drip/liquidate/DripLiquidatorTable";
 import ValidatorBanner from "@/components/drip/liquidate/ValidatorBanner";
 
 export default function DripLiquidatorPage() {
@@ -10,9 +11,7 @@ export default function DripLiquidatorPage() {
         <ValidatorBanner />
       </section>
       <section className="flex flex-col px-1 sm:px-4 w-full items-center lg:px-10 pb-5 gap-4">
-        <p className="text-secondary text-2xl font-bold uppercase pt-4">
-          Liquidate Users Actions and Table
-        </p>
+        <DripLiquidatorTable />
       </section>
     </main>
   );

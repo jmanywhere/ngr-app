@@ -138,7 +138,8 @@ export function DripUserStats() {
           <p className="stat-title text-slate-300">Max Claimable</p>
           <p className="stat-value">
             {formatTokens(
-              ((growAmount || 0n) * maxUSDTClaimable) / growUsedPerMaxClaim,
+              ((growAmount || 0n) * maxUSDTClaimable) /
+                (growUsedPerMaxClaim || 1n),
               10
             )}
           </p>
