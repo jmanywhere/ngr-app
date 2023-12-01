@@ -67,7 +67,7 @@ const MenuButton = () => {
           Audit
         </a>
         <Link
-          href="/app"
+          href="/invest"
           className="p-4 btn btn-primary capitalize font-normal text-black mb-2"
         >
           Invest

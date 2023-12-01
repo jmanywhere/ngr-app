@@ -33,7 +33,7 @@ import {
 import Link from "next/link";
 import { useImmer } from "use-immer";
 
-export const StatsCard = (props: { liquidationDeposits: string }) => {
+export const StatsCard = () => {
   const { address } = useAccount();
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
@@ -148,6 +148,28 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
   return (
     <>
       <div className="flex flex-col items-center">
+        <div className="tabs tabs-boxed mb-2">
+          <Link
+            href="/invest/fixed"
+            className="tab bg-secondary text-white text-xl"
+          >
+            Investor
+          </Link>
+          <Link
+            href="/invest/fixed/liquidators"
+            className={classNames(
+              "tab text-white text-xl"
+              // statsData.isLiquidator
+              //   ? ""
+              //   : "text-white/20 rounded-l-none px-1 pointer-events-none"
+            )}
+            // onClick={(e) =>
+            //   statsData.isLiquidator ? null : e.preventDefault()
+            // }
+          >
+            Liquidator
+          </Link>
+        </div>
         <div className="px-2 w-full">
           {statsData.isLiquidator ? (
             <div className="text-primary text-sm text-center bg-slate-600 px-2 py-1 rounded-t-2xl w-full uppercase">
@@ -171,53 +193,11 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
             </>
           )}
         </div>
-        <div className="tabs tabs-boxed mb-2">
-          <Link href="/app" className="tab bg-secondary text-white text-xl">
-            Investor
-          </Link>
-          <Link
-            href="/app/liquidators"
-            className={classNames(
-              "tab text-white text-xl",
-              statsData.isLiquidator
-                ? ""
-                : "text-white/20 rounded-l-none px-1 pointer-events-none"
-            )}
-            onClick={(e) =>
-              statsData.isLiquidator ? null : e.preventDefault()
-            }
-          >
-            Liquidator
-          </Link>
-        </div>
       </div>
       <section className="flex flex-col gap-y-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Global Stats
         </h2>
-        <div className="stats stats-vertical md:stats-horizontal shadow text-accent ">
-          <div className="stat">
-            <p className="stat-title text-slate-400">Investments</p>
-            <p className="stat-value">
-              {parseFloat(
-                formatEther(
-                  statsData.totalDeposits + BigInt(props.liquidationDeposits)
-                )
-              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </p>
-            <p className="stat-desc text-slate-500">Total in USDT</p>
-          </div>
-          <div className="stat">
-            <p className="stat-title text-slate-400">Liquidations</p>
-            <p className="stat-value">
-              {parseFloat(formatEther(statsData.liquidations)).toLocaleString(
-                undefined,
-                { maximumFractionDigits: 2 }
-              )}
-            </p>
-            <p className="stat-desc text-slate-500">Total USDT</p>
-          </div>
-        </div>
         <div className="stats stats-vertical md:stats-horizontal shadow text-primary bg-slate-900 ">
           <div className="stat">
             <p className="stat-title text-slate-400">GROW Price</p>
@@ -238,11 +218,6 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
           </div>
         </div>
       </section>
-      <ActionsCard
-        refetchOther={fullRefetch}
-        tcv={statsData.tcv}
-        isAutoReinvesting={statsData.isAutoReinvesting}
-      />
       <section className="flex flex-col gap-4">
         <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
           Personal Stats
@@ -271,6 +246,12 @@ export const StatsCard = (props: { liquidationDeposits: string }) => {
           </div>
         </div>
       </section>
+      <ActionsCard
+        refetchOther={fullRefetch}
+        tcv={statsData.tcv}
+        isAutoReinvesting={statsData.isAutoReinvesting}
+      />
+
       <h2 className="w-full font-bold text-3xl drop-shadow text-secondary text-center">
         My Positions
       </h2>

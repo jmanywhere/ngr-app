@@ -1,6 +1,7 @@
 import NgrAbi from "@/abi/NGR2";
 import GrowNGR from "@/abi/NGR_Grow";
 import GrowToken from "@/abi/Grow";
+import DripABI from "@/abi/GrowDrip";
 import {erc20ABI} from "wagmi";
 
 export const ngrContract = "0x0aC58925A4C668AB30d29fdBEC267A795d9f7891";
@@ -9,6 +10,8 @@ export const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
 export const growNGR = "0xCFaFe72b956b19D044722395B2564f8997941Af3";
 export const growToken = "0xA72f53ea4f3Cf19f1F6359E87E58221Bd0a7068b";
+
+export const dripNGR = "0xCCFec1fe10127E8b28B5c1CF5AecCbFa3155435b";
 
 export const ngrConfig = {
   address: ngrContract,
@@ -28,4 +31,14 @@ export const ngrGrowConfig = {
 export const growConfig = {
   address: growToken,
   abi: GrowToken,
+} as const;
+
+export const dripGrowConfig = {
+  address: dripNGR,
+  abi: DripABI,
+} as const;
+
+export const testUSDTConfig = {
+  address: TEST_USDT_ADDRESS,
+  abi: erc20ABI,
 } as const;

@@ -1,8 +1,5 @@
-import { StatsCard } from "@/components/app/Cards";
-import { fi } from "date-fns/locale";
-import { NextPage } from "next";
-import Link from "next/link";
-import { formatEther } from "viem";
+import GrowStats, { FixedNGRStats } from "@/components/app/invest/GrowStats";
+import DripStats from "@/components/drip/Stats";
 
 if (!process.env.BITQUERY_API)
   throw new Error("BITQUERY_API not set in environment variables");
@@ -34,24 +31,35 @@ async function fetchRawGraphQl() {
   return totalDeposits.toString();
 }
 
-const Page: NextPage = async () => {
+export default async function InvestPage() {
   const depositData = await fetchRawGraphQl();
+
   return (
-    <main className="pt-[65px] bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 flex flex-col items-center">
-      <h1 className="text-black text-4xl font-bold pt-5 md:pt-10 uppercase pb-4">
-        Investment
-      </h1>
-
-      <section className="flex flex-col px-5 w-full items-center lg:px-10 pb-5 gap-4">
-        <StatsCard liquidationDeposits={depositData} />
-      </section>
-    </main>
+    <div className="flex flex-col items-center py-10 gap-10">
+      <div>
+        <h2 className="pb-4 text-center">
+          <span className="text-secondary text-3xl font-bold  uppercase">
+            Grow Info
+          </span>
+        </h2>
+        <GrowStats />
+      </div>
+      <div>
+        <h2 className="pb-4 text-center">
+          <span className="text-secondary text-3xl font-bold  uppercase">
+            Fixed
+          </span>
+        </h2>
+        <FixedNGRStats liquidationDeposits={depositData} />
+      </div>
+      <div>
+        <h2 className="pb-4 text-center">
+          <span className="text-secondary text-3xl font-bold  uppercase">
+            Drip
+          </span>
+        </h2>
+        <DripStats />
+      </div>
+    </div>
   );
-};
-
-export default Page;
-
-export const metadata = {
-  title: "Next Gen ROI Dapp",
-  description: "Get your assured 6% return, no BS, no ponzinomics",
-};
+}

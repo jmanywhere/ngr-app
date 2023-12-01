@@ -5,13 +5,13 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-[#16171c] px-5 pt-6 lg:pt-12 flex flex-col items-center">
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:max-w-[500px] items-center pb-6 w-[100vw]">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:max-w-[500px] items-center pb-6 lg:w-[100vw]">
         <Image
           src={logo}
           alt="NextGen Logo"
           className="w-[141px] h-[150] py-5 lg:mr-10"
         />
-        <div className="flex flex-col md:flex-row md:max-w-[250px] md:w-full md:justify-between">
+        <div className="flex flex-col md:flex-row md:max-w-[250px] md:w-full md:justify-between gap-x-10">
           <div className="flex flex-col items-center text-white pb-4">
             <h3 className="font-bold pb-3">GO TO</h3>
             <nav className="flex flex-col items-center text-white">

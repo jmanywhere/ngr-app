@@ -1,7 +1,7 @@
 "use client";
 
 import { WagmiConfig, createConfig } from "wagmi";
-import { bsc } from "viem/chains";
+import { bsc, bscTestnet } from "viem/chains";
 import {
   ConnectKitProvider,
   ConnectKitButton,
