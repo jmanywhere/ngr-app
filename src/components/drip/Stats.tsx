@@ -1,10 +1,5 @@
 "use client";
-import {
-  dripGrowConfig,
-  dripNGR,
-  growConfig,
-  testGrowConfig,
-} from "@/data/contracts";
+import { dripGrowConfig, dripNGR, growConfig } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import { useAccount, useContractReads } from "wagmi";
@@ -25,7 +20,7 @@ export default function DripStats() {
         functionName: "activeDeposits",
       },
       {
-        ...testGrowConfig,
+        ...growConfig,
         functionName: "balanceOf",
         args: [dripNGR],
       },
@@ -81,7 +76,7 @@ export function DripUserStats() {
         args: [address || zeroAddress],
       },
       {
-        ...testGrowConfig,
+        ...growConfig,
         functionName: "calculatePrice",
       },
     ],

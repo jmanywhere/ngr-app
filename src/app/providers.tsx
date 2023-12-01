@@ -8,7 +8,7 @@ import {
   getDefaultConfig,
 } from "connectkit";
 
-const chains = [bsc, bscTestnet];
+const chains = [bsc];
 const projectId = "0499684465a8ff62ec58d6f0e7bb2d66";
 
 const metadata = {

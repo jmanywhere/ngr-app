@@ -4,9 +4,6 @@ import {
   growConfig,
   growToken,
   usdtConfig,
-  testGrowConfig,
-  testUSDTConfig,
-  growTestToken,
   ngrGrowConfig,
   ngrContract,
   growNGR,
@@ -18,16 +15,16 @@ export default function GrowStats() {
   const { data: growData } = useContractReads({
     contracts: [
       {
-        ...testGrowConfig,
+        ...growConfig,
         functionName: "totalSupply",
       },
       {
-        ...testUSDTConfig,
+        ...usdtConfig,
         functionName: "balanceOf",
-        args: [growTestToken],
+        args: [growToken],
       },
       {
-        ...testGrowConfig,
+        ...growConfig,
         functionName: "calculatePrice",
       },
     ],

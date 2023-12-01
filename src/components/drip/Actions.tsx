@@ -1,10 +1,5 @@
 "use client";
-import {
-  dripNGR,
-  dripGrowConfig,
-  testUSDTConfig,
-  usdtConfig,
-} from "@/data/contracts";
+import { dripNGR, dripGrowConfig, usdtConfig } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import classNames from "classnames";
 import { useState } from "react";
@@ -24,12 +19,12 @@ export default function DripActions() {
   const { data: userInfo } = useContractReads({
     contracts: [
       {
-        ...testUSDTConfig,
+        ...usdtConfig,
         functionName: "balanceOf",
         args: [address || zeroAddress],
       },
       {
-        ...testUSDTConfig,
+        ...usdtConfig,
         functionName: "allowance",
         args: [address || zeroAddress, dripNGR],
       },
@@ -48,7 +43,7 @@ export default function DripActions() {
   });
 
   const { config: approveConfig } = usePrepareContractWrite({
-    ...testUSDTConfig,
+    ...usdtConfig,
     functionName: "approve",
     args: [dripNGR, maxUint256],
   });
