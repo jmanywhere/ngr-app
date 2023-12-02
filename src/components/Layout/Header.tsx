@@ -17,10 +17,16 @@ const Header = () => {
       <div className="flex flex-row items-center">
         <nav className="hidden text-sm lg:flex px-3 flex-row items-center gap-3">
           <Link
-            href="/faqs"
-            className="btn btn-link no-underline font-light capitalize text-black px-3"
+            href="/faqs#fixed"
+            className="btn btn-link no-underline font-light capitalize text-black px-3 whitespace-pre-wrap"
           >
-            FAQs
+            FAQs{"\n"}Fixed
+          </Link>
+          <Link
+            href="/faqs#drip"
+            className="btn btn-link no-underline font-light capitalize text-black px-3 whitespace-pre-wrap"
+          >
+            FAQs{"\n"}Drip
           </Link>
           {/* <a href="#Lottery" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Lottery

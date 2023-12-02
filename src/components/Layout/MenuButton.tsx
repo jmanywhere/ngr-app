@@ -40,12 +40,18 @@ const MenuButton = () => {
         </svg>
       </summary>
       <nav className="shadow menu flex flex-col gap-y-4 dropdown-content bg-white w-[100vw] text-black text-center">
-        <a
-          href="#FAQ"
+        <Link
+          href="/faqs#fixed"
           className="btn btn-link text-lg no-underline text-black font-light"
         >
-          FAQ
-        </a>
+          FAQ Fixed
+        </Link>
+        <Link
+          href="/faqs#drip"
+          className="btn btn-link text-lg no-underline text-black font-light"
+        >
+          FAQ Drip
+        </Link>
         {/* <a href="#Lottery" className="p-4 text-lg">
           Lotery
         </a>

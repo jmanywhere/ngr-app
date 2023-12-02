@@ -49,29 +49,18 @@ const Page: NextPage = () => {
           </h2>
           <ol className="list-decimal px-5 text-white">
             <li className="pb-2 text-sm md:text-base">
-              Duration of each investment is brief (a few hours to a few weeks)
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Auto-reinvestment option to compound earnings and maximize APY
+              dhoose from a fixed final return or a daily drip, or do both
             </li>
             <li className="pb-2 text-sm md:text-base">Fully collateralized</li>
-            <li className="pb-2 text-sm md:text-base">Max risk is just 8%</li>
             <li className="pb-2 text-sm md:text-base">Zero Ponzinomics</li>
             <li className="pb-2 text-sm md:text-base">
-              Whale proof and small investor friendly
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Price impact is always high because TCV is kept low
+              Serves Small and large investors equally
             </li>
             <li className="pb-2 text-sm md:text-base">
               Multiple investments from the same wallet
             </li>
             <li className="pb-2 text-sm md:text-base">
-              Frequent contract-embedded owner-funded buy & burns to constantly
-              boost price
-            </li>
-            <li className="pb-2 text-sm md:text-base">
-              Token price NEVER goes down
+              GROW token price RISES after EVERY TX
             </li>
             <li className="pb-2 text-sm md:text-base">
               {" "}
@@ -87,7 +76,7 @@ const Page: NextPage = () => {
           </Link>
         </div>
       </section>
-      <section className="flex flex-col items-center py-14 px-3">
+      {/* <section className="flex flex-col items-center py-14 px-3">
         <Image src={Logo} alt="logo" className="pb-10" height={300} />
         <p className="text-center px-5 text-xs text-black font-medium lg:max-w-[1024px]">
           NGR provides investors repeated returns of 5%. Each investment can
@@ -123,7 +112,7 @@ const Page: NextPage = () => {
           wallet will do frequent buy &amp; burns to push the price higher and
           higher. The more invested, the more burned.
         </p>
-      </section>
+      </section> */}
     </main>
   );
 };
