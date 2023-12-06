@@ -60,19 +60,23 @@ export default function DripLiquidatorTable(props: {
 
   const allValidUsers = allUsers.filter((user) => {
     const currentTime = BigInt(Math.floor(new Date().getTime() / 1000));
-    user.info &&
+    return (
+      user.info &&
       user.info[0] > 0n &&
-      currentTime - user.info[2] > (liquidationThreshold || 25n * 3600n);
+      currentTime - user.info[2] > (liquidationThreshold || 25n * 3600n)
+    );
   });
 
   return (
     <div className="bg-slate-600 rounded-lg mb-12">
       <table className="table table-zebra">
         <thead>
-          <th>User</th>
-          <th>Time Since Max</th>
-          <th>Reward</th>
-          <th />
+          <tr>
+            <th>User</th>
+            <th>Time Since Max</th>
+            <th>Reward</th>
+            <th />
+          </tr>
         </thead>
         <tbody className="text-white/70">
           {allValidUsers.length == 0 ? (
