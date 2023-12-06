@@ -2,41 +2,41 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import barsAndLogo from "../../public/images/heroimg.png";
 import barsAndGuy from "../../public/images/Image_1.png";
-import Logo from "../../public/Logo.png";
 import Link from "next/link";
 
 const Page: NextPage = () => {
   return (
     <main className="mt-[65px] flex flex-col items-center ">
       <section className="flex flex-col lg:flex-row items-center justify-center p-6 lg:p-28 bg-hero-pattern-500 md:bg-hero-pattern-800 lg:bg-hero-pattern-1080 bg-cover w-full">
+        <div className="flex flex-col items-center">
+          <h2 className="text-[#012970] text-2xl md:text-4xl lg:text-5xl uppercase font-bold max-w-[300px] md:max-w-[650px] mb-3 lg:mb-6 text-center">
+            The World&apos;s First Fully Collateralized ROI Platform
+          </h2>
+          <div className="flex flex-row items-center justify-center gap-6 w-full font-bold">
+            <div className="flex flex-col items-center">
+              <div className="text-sm md:text-lg whitespace-pre-wrap">
+                <p>5% Fixed ROI</p>
+                <p>Min Deposit:{"\n"}$10</p>
+                <p>Max Deposit:{"\n"}$25</p>
+              </div>
+              <Link href="/invest/fixed" className="btn btn-primary">
+                Invest Fixed
+              </Link>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="text-sm md:text-lg whitespace-pre-wrap">
+                <p>0.5% Daily Drip</p>
+                <p>Min Deposit:{"\n"}$100</p>
+                <p>Max Deposit:{"\n"}None</p>
+              </div>
+              <Link href="/invest/drip" className="btn btn-secondary">
+                Invest Drip
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="mb-5 lg:order-2 lg:max-w-[500px]">
           <Image alt="logo" src={barsAndLogo} />
-        </div>
-        <div className="p-5 lg:order-1 lg:p-">
-          <h2 className="text-[#012970] text-2xl md:text-4xl lg:text-5xl uppercase font-bold max-w-[300px] md:max-w-[650px] mb-3 lg:mb-6">
-            THE FIRST EVER FULLY COLLATERALIZED ACCELERATED ROI PLATFORM
-          </h2>
-          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            5% ROI (100% APY)
-          </p>
-          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            Zero Ponzinomics
-          </p>
-          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            Max Risk 8%
-          </p>
-          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 lg:mb-5">
-            Available on Binance Smart Chain. Other chains coming soon!
-          </p>
-          <p className="text-[black] font-semibold text-sm md:text-base lg:text-lg lg:font-semibold mb-3 md:mb-12 lg:mb-16">
-            External revenue models in development
-          </p>
-          <Link
-            href="/app"
-            className="btn btn-primary capitalize text-black  px-6"
-          >
-            Invest
-          </Link>
         </div>
       </section>
       <section className="bg-[#16171c] pt-20 pb-5 md:pb-14 lg:px-6 flex flex-col lg:flex-row lg:items-center w-full lg:justify-center">
@@ -49,7 +49,7 @@ const Page: NextPage = () => {
           </h2>
           <ol className="list-decimal px-5 text-white">
             <li className="pb-2 text-sm md:text-base">
-              dhoose from a fixed final return or a daily drip, or do both
+              Choose from a fixed final return or a daily drip, or do both
             </li>
             <li className="pb-2 text-sm md:text-base">Fully collateralized</li>
             <li className="pb-2 text-sm md:text-base">Zero Ponzinomics</li>

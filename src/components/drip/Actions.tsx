@@ -3,7 +3,13 @@ import { dripNGR, dripGrowConfig, usdtConfig } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import classNames from "classnames";
 import { useState } from "react";
-import { BaseError, maxUint256, parseEther, zeroAddress } from "viem";
+import {
+  BaseError,
+  formatEther,
+  maxUint256,
+  parseEther,
+  zeroAddress,
+} from "viem";
 import {
   useAccount,
   useContractReads,
@@ -108,8 +114,6 @@ export default function DripActions() {
     confirmations: 5,
   });
 
-  const hasAllowance =
-    ((userInfo?.[1].result || 0n) as bigint) > parseEther("100");
   const action1Loading =
     approveLoading || approveTxLoading || depositLoading || depositTxLoading;
 
@@ -125,6 +129,10 @@ export default function DripActions() {
       deposits: userInfo?.[3].result?.[0] || (0n as bigint),
     },
   };
+  const hasAllowance =
+    userInfoParsed.user.deposits > 0n
+      ? (userInfoParsed.allowance || 0n) >= parseEther(depositAmount || "0")
+      : (userInfoParsed.allowance || 0n) >= parseEther("100");
 
   return (
     <div className="text-white/90 px-4 py-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 max-w-[90vw]">
@@ -145,7 +153,18 @@ export default function DripActions() {
                 }}
                 onFocus={(e) => e.target.select()}
               />
-              <button className="btn btn-primary join-item">Max</button>
+              <button
+                className="btn btn-primary join-item"
+                onClick={() =>
+                  setDepositAmount(
+                    parseInt(
+                      formatEther(userInfoParsed.usdtBalance || 0n)
+                    ).toString()
+                  )
+                }
+              >
+                Max
+              </button>
             </div>
             <label className="label">
               <span className="label-text-alt">Wallet:</span>

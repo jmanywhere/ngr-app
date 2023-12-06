@@ -7,18 +7,29 @@ import intervalToDuration from "date-fns/intervalToDuration";
 import { useImmer } from "use-immer";
 import {
   useContractRead,
+  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
 
-export default function DripLiquidatorTable() {
+export default function DripLiquidatorTable(props: {
+  users: Array<`0x${string}`>;
+}) {
+  const { users } = props;
   const [selectedIds, setSelectedIds] = useImmer<
     Array<{ address: `0x${string}`; reward: bigint }>
   >([]);
-  const { data: liquidationInfo } = useContractRead({
+  const { data: liquidationThreshold } = useContractRead({
     ...dripGrowConfig,
-    functionName: "usersPendingLiquidation",
+    functionName: "liquidationThresholdHours",
+  });
+  const { data: liquidationInfo } = useContractReads({
+    contracts: users.map((user) => ({
+      ...dripGrowConfig,
+      functionName: "users",
+      args: [user],
+    })),
     watch: true,
   });
 
@@ -40,7 +51,20 @@ export default function DripLiquidatorTable() {
     hash: liquidateData?.hash,
   });
 
-  const allUsers = (liquidationInfo?.[0] as Array<`0x${string}`>) || [];
+  const allUsers = users.map((user, index) => ({
+    info: liquidationInfo?.[index]?.result as
+      | undefined
+      | [bigint, bigint, bigint, bigint, bigint],
+    address: user,
+  }));
+
+  const allValidUsers = allUsers.filter((user) => {
+    const currentTime = BigInt(Math.floor(new Date().getTime() / 1000));
+    user.info &&
+      user.info[0] > 0n &&
+      currentTime - user.info[2] > (liquidationThreshold || 25n * 3600n);
+  });
+
   return (
     <div className="bg-slate-600 rounded-lg mb-12">
       <table className="table table-zebra">
@@ -51,7 +75,7 @@ export default function DripLiquidatorTable() {
           <th />
         </thead>
         <tbody className="text-white/70">
-          {allUsers.length == 0 ? (
+          {allValidUsers.length == 0 ? (
             <tr>
               <td
                 colSpan={4}
@@ -61,14 +85,18 @@ export default function DripLiquidatorTable() {
               </td>
             </tr>
           ) : (
-            allUsers.map((userAddress) => {
+            allValidUsers.map((user) => {
+              const rewardAmount = (user.info?.[0] || 0n) / 1000n;
+              const lastClaim = user.info?.[2] || 0n;
               return (
                 <RowInfo
-                  key={`to-liquidate-${userAddress}`}
-                  address={userAddress}
+                  key={`to-liquidate-${user.address}`}
+                  address={user.address}
                   selected={selectedIds.some(
-                    (item) => item.address === userAddress
+                    (item) => item.address === user.address
                   )}
+                  rewardAmount={rewardAmount}
+                  lastClaim={lastClaim}
                   updateSelection={(address, reward) => {
                     setSelectedIds((draft) => {
                       if (draft.some((item) => item.address === address)) {
@@ -102,7 +130,7 @@ export default function DripLiquidatorTable() {
           disabled={
             liquidateLoading ||
             liquidateTxLoading ||
-            allUsers.length == 0 ||
+            users.length == 0 ||
             selectedIds.length == 0 ||
             !!liquidateConfigError
           }
@@ -121,16 +149,12 @@ export default function DripLiquidatorTable() {
 
 function RowInfo(props: {
   address: `0x${string}`;
+  rewardAmount: bigint;
+  lastClaim: bigint;
   selected?: boolean;
   updateSelection: (address: `0x${string}`, reward: bigint) => void;
 }) {
-  const { data: userInfo } = useContractRead({
-    ...dripGrowConfig,
-    functionName: "users",
-    args: [props.address],
-  });
-
-  const rewardAmount = ((userInfo?.[0] || 0n) as bigint) / 1000n;
+  const { address, rewardAmount, lastClaim, selected, updateSelection } = props;
 
   return (
     <tr
@@ -149,12 +173,7 @@ function RowInfo(props: {
       <td>
         {formatDuration(
           intervalToDuration({
-            start: parseInt(
-              (
-                (((userInfo?.[2] || 0n) as bigint) + 24n * 3600n) *
-                1000n
-              ).toString()
-            ),
+            start: parseInt(((lastClaim + 24n * 3600n) * 1000n).toString()),
             end: new Date().getTime(),
           }),
           {
