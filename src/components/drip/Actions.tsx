@@ -131,8 +131,8 @@ export default function DripActions() {
   };
   const hasAllowance =
     userInfoParsed.user.deposits > 0n
-      ? (userInfoParsed.allowance || 0n) > parseEther(depositAmount || "0")
-      : (userInfoParsed.allowance || 0n) > parseEther("100");
+      ? (userInfoParsed.allowance || 0n) >= parseEther(depositAmount || "0")
+      : (userInfoParsed.allowance || 0n) >= parseEther("100");
 
   return (
     <div className="text-white/90 px-4 py-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 max-w-[90vw]">
