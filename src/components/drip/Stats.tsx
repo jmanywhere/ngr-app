@@ -3,6 +3,8 @@ import { dripGrowConfig, dripNGR, growConfig } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import { formatEther, parseEther, zeroAddress } from "viem";
 import { useAccount, useContractReads } from "wagmi";
+import intervalToDuration from "date-fns/intervalToDuration";
+import { useEffect, useState } from "react";
 
 export default function DripStats() {
   const { data: statData } = useContractReads({
@@ -62,6 +64,13 @@ export default function DripStats() {
 }
 
 export function DripUserStats() {
+  const [currentTime, setCurrentTime] = useState(new Date().getTime());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().getTime());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setCurrentTime]);
   const { address } = useAccount();
   const { data: userInfo } = useContractReads({
     contracts: [
@@ -83,7 +92,14 @@ export function DripUserStats() {
     watch: true,
   });
 
-  const { deposits, claimed, liquidatorEarnings, price, growAmount } = {
+  const {
+    deposits,
+    claimed,
+    liquidatorEarnings,
+    price,
+    growAmount,
+    lastAction,
+  } = {
     //@ts-ignore
     deposits: userInfo?.[0].result?.[0] as bigint | undefined,
     //@ts-ignore
@@ -92,13 +108,19 @@ export function DripUserStats() {
     price: userInfo?.[2].result as bigint | undefined,
     //@ts-ignore
     growAmount: userInfo?.[0].result?.[1] as bigint | undefined,
+    //@ts-ignore
+    lastAction: userInfo?.[0].result?.[2] as bigint | undefined,
   };
 
-  console.log({ userInfo });
   const maxUSDTClaimable = ((deposits || 0n) * 5n) / 1000n;
   const growUsedPerMaxClaim =
     ((deposits || 0n) * 5n * parseEther("1") * 100n) /
     (1000n * 95n * (price || 1n));
+
+  const timeUntilMaxClaim = intervalToDuration({
+    start: currentTime,
+    end: parseInt(((lastAction || 0n) + 86400n).toString()) * 1000,
+  });
   return (
     <>
       <div className="stats stats-vertical md:stats-horizontal shadow text-primary ">
@@ -160,6 +182,47 @@ export function DripUserStats() {
             )}
           </p>
           <p className="stat-desc">USDT</p>
+        </div>
+      </div>
+      <div>
+        <h4>Time until max claimable: </h4>
+        <div className="stats bg-transparent text-black">
+          <div className="stat">
+            <p className="stat-value countdown">
+              <span
+                style={
+                  {
+                    "--value": timeUntilMaxClaim.hours,
+                  } as any
+                }
+              />
+            </p>
+            <p className="stat-desc text-black">Hours</p>
+          </div>
+          <div className="stat">
+            <p className="stat-value countdown">
+              <span
+                style={
+                  {
+                    "--value": timeUntilMaxClaim.minutes,
+                  } as any
+                }
+              />
+            </p>
+            <p className="stat-desc text-black">Minutes</p>
+          </div>
+          <div className="stat">
+            <p className="stat-value countdown">
+              <span
+                style={
+                  {
+                    "--value": timeUntilMaxClaim.seconds,
+                  } as any
+                }
+              />
+            </p>
+            <p className="stat-desc text-black">Seconds</p>
+          </div>
         </div>
       </div>
     </>
