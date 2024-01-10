@@ -1,12 +1,13 @@
 import GrowStats, { FixedNGRStats } from "@/components/app/invest/GrowStats";
 import DripStats from "@/components/drip/Stats";
 
-if (!process.env.BITQUERY_API)
-  throw new Error("BITQUERY_API not set in environment variables");
+if (!process.env.BITQUERY_API || !process.env.BITQUERY_BEARER_KEY)
+  throw new Error("BITQUERY keys not set in environment variables");
 
 const myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 myHeaders.append("X-API-KEY", process.env.BITQUERY_API);
+myHeaders.append("Authorization", `Bearer ${process.env.BITQUERY_BEARER_KEY}`);
 
 const raw = JSON.stringify({
   query:
@@ -33,7 +34,6 @@ async function fetchRawGraphQl() {
 
 export default async function InvestPage() {
   const depositData = await fetchRawGraphQl();
-
   return (
     <div className="flex flex-col items-center py-10 gap-10">
       <div>
