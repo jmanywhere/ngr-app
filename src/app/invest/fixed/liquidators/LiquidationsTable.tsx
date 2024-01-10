@@ -63,10 +63,7 @@ export default function LiquidationsTable() {
   const { data: positions } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getPositions",
-    args: [
-      currentPositionToLiquidate,
-      queuePosition - currentPositionToLiquidate,
-    ],
+    args: [1n, queuePosition - 1n],
     enabled: (queuePosition > 0n) as boolean,
     watch: true,
   });
@@ -99,7 +96,7 @@ export default function LiquidationsTable() {
         return null;
       return {
         ...position,
-        index: parseInt(currentPositionToLiquidate.toString()) + index,
+        index: index + 1,
       };
     }) as Array<{
       owner: `0x${string}`;
@@ -166,12 +163,14 @@ export default function LiquidationsTable() {
       <div className="bg-slate-600 rounded-lg mb-12">
         <table className="table">
           <thead>
-            <th>Position ID</th>
-            <th>GROW Amount</th>
-            <th>Liquidation Price</th>
-            <th>Profit To Earn</th>
-            <th>Can Liquidate</th>
-            <th />
+            <tr>
+              <th>Position ID</th>
+              <th>GROW Amount</th>
+              <th>Liquidation Price</th>
+              <th>Profit To Earn</th>
+              <th>Can Liquidate</th>
+              <th />
+            </tr>
           </thead>
           <tbody className="text-white/70">
             {descPositions.length > 0 ? (
