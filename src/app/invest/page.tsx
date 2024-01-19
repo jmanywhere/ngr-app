@@ -20,11 +20,17 @@ async function fetchRawGraphQl() {
     method: "POST",
     headers: myHeaders,
     body: raw,
+    redirect: "follow",
     next: { revalidate: 3600 },
-  }).catch((err) => {
-    console.log(err);
-    return null;
-  });
+  })
+    .then((x) => {
+      if (x.status !== 200) return null;
+      return x;
+    })
+    .catch((err) => {
+      console.log(err);
+      return null;
+    });
   if (!res) return "4065750000000000000000";
   const fullData = await res.json();
   const data = fullData.data.EVM.Events;
