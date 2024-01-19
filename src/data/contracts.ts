@@ -2,6 +2,7 @@ import NgrAbi from "@/abi/NGR2";
 import GrowNGR from "@/abi/NGR_Grow";
 import GrowToken from "@/abi/Grow";
 import DripABI from "@/abi/GrowDrip";
+import MinerABI from "@/abi/Miner";
 import {erc20ABI} from "wagmi";
 
 export const ngrContract = "0x0aC58925A4C668AB30d29fdBEC267A795d9f7891";
@@ -13,13 +14,17 @@ export const growToken = "0xA72f53ea4f3Cf19f1F6359E87E58221Bd0a7068b";
 
 export const dripNGR = "0xCCFec1fe10127E8b28B5c1CF5AecCbFa3155435b";
 
+const TEST_GROW = "0x2E0347eC54BF7c3758bAb1faB409Bc758f2765B9";
+const TEST_MINER = "0x958662BE83cbCe9aa453D50E89e99A02bCa37B22";
+const MINER = "0x1111111111111111111111111111111111111";
+
 export const ngrConfig = {
   address: ngrContract,
   abi: NgrAbi,
 } as const;
 
 export const usdtConfig = {
-  address: USDT_ADDRESS,
+  address: process.env.NODE_ENV === "production"? USDT_ADDRESS : TEST_USDT_ADDRESS,
   abi: erc20ABI,
 } as const;
 
@@ -29,7 +34,7 @@ export const ngrGrowConfig = {
 } as const;
 
 export const growConfig = {
-  address: growToken,
+  address: process.env.NODE_ENV === "production"? growToken : TEST_GROW,
   abi: GrowToken,
 } as const;
 
@@ -41,4 +46,9 @@ export const dripGrowConfig = {
 export const testUSDTConfig = {
   address: TEST_USDT_ADDRESS,
   abi: erc20ABI,
+} as const;
+
+export const minerConfig = {
+  address: process.env.NODE_ENV === "production"? MINER : TEST_MINER,
+  abi: MinerABI,
 } as const;
