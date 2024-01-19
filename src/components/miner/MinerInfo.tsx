@@ -1,11 +1,18 @@
 "use client";
 
-import { growConfig, minerConfig, usdtConfig } from "@/data/contracts";
-import { formatTokens } from "@/utils/stringify";
+import {
+  dripGrowConfig,
+  growConfig,
+  minerConfig,
+  ngrGrowConfig,
+  usdtConfig,
+} from "@/data/contracts";
+import shortAddress, { formatTokens } from "@/utils/stringify";
 import classNames from "classnames";
 import { useSearchParams } from "next/navigation";
 import { use, useState } from "react";
 import {
+  Address,
   formatEther,
   isAddress,
   maxUint256,
@@ -60,6 +67,20 @@ export default function MinerInfo() {
         functionName: "allowance",
         args: [address || zeroAddress, minerConfig.address || zeroAddress],
       },
+      {
+        ...minerConfig,
+        functionName: "getLiquidatableUsers",
+      },
+      {
+        ...dripGrowConfig,
+        functionName: "users",
+        args: [address || zeroAddress],
+      },
+      {
+        ...ngrGrowConfig,
+        functionName: "userStats",
+        args: [address || zeroAddress],
+      },
     ],
     watch: true,
   });
@@ -76,6 +97,9 @@ export default function MinerInfo() {
     invested,
     claimed,
     lockedEggs,
+    liquidUsers,
+    userDripDeposits,
+    userFixedDeposits,
   } = {
     price: (minerData?.[1].result || 0n) as bigint,
     minerGrow: (minerData?.[2].result || 0n) as bigint,
@@ -88,6 +112,9 @@ export default function MinerInfo() {
     invested: ((minerData?.[0].result as any)?.[1] || 0n) as bigint,
     claimed: ((minerData?.[0].result as any)?.[2] || 0n) as bigint,
     lockedEggs: ((minerData?.[0].result as any)?.[4] || 0n) as bigint,
+    liquidUsers: minerData?.[7].result as [Address[], bigint[]] | undefined,
+    userDripDeposits: ((minerData?.[8].result as any)?.[0] || 0n) as bigint,
+    userFixedDeposits: ((minerData?.[9].result as any)?.[0] || 0n) as bigint,
   };
 
   const claimable = (9n * eggs * minerGrow) / ((marketEggs + eggs) * 10n);
@@ -122,6 +149,12 @@ export default function MinerInfo() {
       ...minerConfig,
       functionName: "compoundResources",
     });
+  const { config: liquidationConfig, error: liquidationConfigError } =
+    usePrepareContractWrite({
+      ...minerConfig,
+      functionName: "liquidateUsers",
+      args: [liquidUsers?.[0] || []],
+    });
 
   const {
     write: approveWrite,
@@ -149,6 +182,12 @@ export default function MinerInfo() {
     data: compoundData,
   } = useContractWrite(compoundConfig);
 
+  const {
+    write: liquidationWrite,
+    isLoading: liquidationLoading,
+    data: liquidationData,
+  } = useContractWrite(liquidationConfig);
+
   const { isLoading: approveTxLoading } = useWaitForTransaction({
     hash: approveData?.hash,
     confirmations: 5,
@@ -165,6 +204,10 @@ export default function MinerInfo() {
     hash: compoundData?.hash,
     confirmations: 5,
   });
+  const { isLoading: liquidationTxLoading } = useWaitForTransaction({
+    hash: liquidationData?.hash,
+    confirmations: 5,
+  });
 
   const actionsLoading =
     depositLoading ||
@@ -172,7 +215,9 @@ export default function MinerInfo() {
     compoundLoading ||
     compoundTxLoading ||
     claimLoading ||
-    claimTxLoading;
+    claimTxLoading ||
+    approveLoading ||
+    approveTxLoading;
 
   return (
     <>
@@ -330,6 +375,56 @@ export default function MinerInfo() {
             : "connect wallet and deposit into miner"}
         </a>
       </div>
+      {userFixedDeposits + userDripDeposits > 0n && (
+        <>
+          <div className="w-full py-5 bg-slate-700 rounded-3xl">
+            <h4 className="text-2xl font-bold text-center text-primary">
+              Liquidations Table
+            </h4>
+          </div>
+          <table className="table w-full bg-slate-700 text-white">
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>Approx. Grow Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(liquidUsers?.[0]?.length || 0) > 0 ? (
+                liquidUsers?.[0].map((user, i) => (
+                  <tr key={i}>
+                    <td>{shortAddress(user)}</td>
+                    <td>{formatTokens(liquidUsers?.[1][i] || 0n, 2)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2} className="text-center">
+                    No users to liquidate
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <div className="w-full py-2 flex flex-col items-center">
+            <button
+              className="btn btn-secondary"
+              onClick={() => liquidationWrite?.()}
+              disabled={
+                liquidationTxLoading ||
+                liquidationLoading ||
+                !liquidUsers?.[0].length
+              }
+            >
+              {liquidationTxLoading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                "Liquidate Users"
+              )}
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 }

@@ -7,3 +7,7 @@ export function formatTokens(amount?: bigint, maxDecimals?: number) {
     return parsedNumber.toLocaleString(undefined, { maximumFractionDigits: 1 })
   return parsedNumber.toLocaleString(undefined, { maximumFractionDigits: maxDecimals || 0 }); 
 }
+
+export default function shortAddress(address: string) {
+  return `${address.slice(0, 4)}...${address.slice(-4)}`
+}
