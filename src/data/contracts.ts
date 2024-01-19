@@ -24,7 +24,7 @@ export const ngrConfig = {
 } as const;
 
 export const usdtConfig = {
-  address: process.env.NODE_ENV === "production"? USDT_ADDRESS : TEST_USDT_ADDRESS,
+  address: process.env.NEXT_PUBLIC_TEST_CONTRACTS === "0"? USDT_ADDRESS : TEST_USDT_ADDRESS,
   abi: erc20ABI,
 } as const;
 
@@ -34,7 +34,7 @@ export const ngrGrowConfig = {
 } as const;
 
 export const growConfig = {
-  address: process.env.NODE_ENV === "production"? growToken : TEST_GROW,
+  address: process.env.NEXT_PUBLIC_TEST_CONTRACTS === "0"? growToken : TEST_GROW,
   abi: GrowToken,
 } as const;
 
@@ -49,6 +49,6 @@ export const testUSDTConfig = {
 } as const;
 
 export const minerConfig = {
-  address: process.env.NODE_ENV === "production"? MINER : TEST_MINER,
+  address: process.env.NEXT_PUBLIC_TEST_CONTRACTS === "0"? MINER : TEST_MINER,
   abi: MinerABI,
 } as const;
