@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 
 import QuestionDropdown from "@/components/faq/QuestionDropdown";
-import { fixedQ, dripF } from "@/data/faqs";
+import { fixedQ, dripF, minerF } from "@/data/faqs";
 import Link from "next/link";
 
 const Page: NextPage = () => {
@@ -50,6 +50,19 @@ const Page: NextPage = () => {
           ))}
         </div>
       </section>
+      <section className=" pb-5">
+        <div className="flex flex-col w-full items-center rounded-2xl border-2 border-black overflow-hidden">
+          <h2
+            className="text-2xl text-secondary font-bold py-5 bg-gray-300 w-full text-center"
+            id="miner"
+          >
+            Miner
+          </h2>
+          {minerF.map((q, i) => (
+            <QuestionDropdown key={`drip-${i}`} question={q[0]} ans={q[1]} />
+          ))}
+        </div>
+      </section>
     </main>
   );
 };
@@ -57,6 +70,6 @@ const Page: NextPage = () => {
 export default Page;
 
 export const metadata = {
-  title: "Next Gen ROI Dapp",
-  description: "Get your assured 6% return, no BS, no ponzinomics",
+  title: "NGR - FAQ",
+  description: "All your answers for all our systems",
 };

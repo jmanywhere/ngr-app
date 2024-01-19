@@ -151,3 +151,26 @@ export const dripF: Array<[string, string]> = [
 "Any investor at any time can always add to their position, and that will adjust their Drip accordingly. The minimum is $100, and there will be a $10 minimum after that if investors want to add to their positions.  In addition, all investments must be integers.  For example, one can invest $125, but they cannot invest $125.50."
 ],
 ]
+
+export const minerF: Array<[string, string]> = [
+  ["What makes NGR Miner different from other miners?",
+"NGR Miner uses GROW token as its currency.  Because GROW is an appreciating stablecoin, Miner holdings can ascend very quickly.  Risk is also hedged to the downside."],
+
+["What does the Miner pay?",
+"Up to 3% per day."],
+
+["Can the NGR Miner negatively impact Fixed and Drips investors?",
+"Absolutely NOT.  Any investment in NGR Miner can only help Fixed and Drips investors."],
+
+["Must an investor be invested in Fixed or Drips in order to participate?",
+"No.  Originally being a Fixed or Drips investor was supposed to be a prerequisite for the Miner, but after further thought the team felt that anyone should be able to invest in the Miner, keeping in mind that transactions will only help Fixed and Drips investors."],
+
+["How do Drips and Fixed investors benefit exactly from the Miner?",
+"The Miner will have its own pool, just like Fixed is a pool, just like Drips is a pool.  Every time an investor interacts with the Miner contract, GROW’s price will rise.  Although the Miner pool may go up and down in TCV depending on communal actions, those in Fixed and Drips will only benefit because the overall price of GROW will rise every time it’s traded."],
+
+["What else is unique about NGR Miner?",
+"Every investor must take an action at least once every 24 hours.  Most will compound way more than that, but once per day is the minimum.  If an investor fails to take an action (compound / redeem), the contents of the pending claim will be force liquidated. This is a GOOD thing.  Inactive investors cause GROW price stagnation, so by force liquidating inactive investors we ensure constant price appreciation."],
+
+["Is the NGR Miner just a fork of Binance Wealth Matrix?",
+"No.  Other than both projects mining an appreciating stablecoin, NGR Miner functions nothing like BWM.  BWM was poorly thought out and poorly executed.  We've optimized NGR Miner in almost every way possible in order to maximize profits and minimize risk."],
+]
