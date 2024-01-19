@@ -21,8 +21,11 @@ async function fetchRawGraphQl() {
     headers: myHeaders,
     body: raw,
     next: { revalidate: 3600 },
+  }).catch((err) => {
+    console.log(err);
+    return null;
   });
-
+  if (!res) return "4065750000000000000000";
   const fullData = await res.json();
   const data = fullData.data.EVM.Events;
   const totalDeposits = data.reduce((acc: bigint, curr: any) => {
@@ -34,6 +37,7 @@ async function fetchRawGraphQl() {
 
 export default async function InvestPage() {
   const depositData = await fetchRawGraphQl();
+  console.log(depositData);
   return (
     <div className="flex flex-col items-center py-10 gap-10">
       <div>
