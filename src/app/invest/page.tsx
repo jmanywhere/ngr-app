@@ -1,5 +1,6 @@
 import GrowStats, { FixedNGRStats } from "@/components/app/invest/GrowStats";
 import DripStats from "@/components/drip/Stats";
+import { MinerStats } from "@/components/miner/MinerInfo";
 
 if (!process.env.BITQUERY_API || !process.env.BITQUERY_BEARER_KEY)
   throw new Error("BITQUERY keys not set in environment variables");
@@ -43,7 +44,6 @@ async function fetchRawGraphQl() {
 
 export default async function InvestPage() {
   const depositData = await fetchRawGraphQl();
-  console.log(depositData);
   return (
     <div className="flex flex-col items-center py-10 gap-10">
       <div>
@@ -69,6 +69,14 @@ export default async function InvestPage() {
           </span>
         </h2>
         <DripStats />
+      </div>
+      <div>
+        <h2 className="pb-4 text-center">
+          <span className="text-secondary text-3xl font-bold  uppercase">
+            Miner
+          </span>
+        </h2>
+        <MinerStats />
       </div>
     </div>
   );

@@ -428,3 +428,27 @@ export default function MinerInfo() {
     </>
   );
 }
+
+export function MinerStats() {
+  const { data } = useContractReads({
+    contracts: [
+      {
+        ...growConfig,
+        functionName: "balanceOf",
+        args: [minerConfig.address || zeroAddress],
+      },
+    ],
+  });
+
+  const minerGrow = (data?.[0].result || 0n) as bigint;
+
+  return (
+    <div className="stats stats-vertical md:stats-horizontal shadow text-red-200 ">
+      <div className="stat">
+        <p className="stat-title text-slate-300">TVL</p>
+        <p className="stat-value">{formatTokens(minerGrow, 4)}</p>
+        <p className="stat-desc">Grow in Miner</p>
+      </div>
+    </div>
+  );
+}

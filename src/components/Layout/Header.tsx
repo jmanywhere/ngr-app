@@ -28,6 +28,12 @@ const Header = () => {
           >
             FAQs{"\n"}Drip
           </Link>
+          <Link
+            href="/faqs#miner"
+            className="btn btn-link no-underline font-light capitalize text-black px-3 whitespace-pre-wrap"
+          >
+            FAQs{"\n"}Miner
+          </Link>
           {/* <a href="#Lottery" className="btn btn-link no-underline font-light capitalize text-black px-3">
           Lottery
         </a>
