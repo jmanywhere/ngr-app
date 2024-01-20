@@ -366,12 +366,12 @@ export default function MinerInfo() {
           rel="noreferrer"
           href={
             address && miners > 0n
-              ? `https://nextgenroi.com/miner?ref=${address}`
+              ? `https://nextgenroi.com/invest/miner?ref=${address}`
               : "about:blank"
           }
         >
           {address && miners > 0n
-            ? `https://nextgenroi.com/miner?ref=${address}`
+            ? `https://nextgenroi.com/invest/miner?ref=${address}`
             : "connect wallet and deposit into miner"}
         </a>
       </div>
