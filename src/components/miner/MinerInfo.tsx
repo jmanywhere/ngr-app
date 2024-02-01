@@ -120,7 +120,8 @@ export default function MinerInfo() {
   const claimable = (9n * eggs * minerGrow) / ((marketEggs + eggs) * 10n);
   const referralRewards = (9n * refEggs) / ((marketEggs + eggs) * 10n);
 
-  const hasAllowance = usdtAllowance > parseEther("10");
+  const hasAllowance =
+    usdtAllowance > (parseEther(depositAmount || "0") || parseEther("10"));
 
   const { config: approveConfig } = usePrepareContractWrite({
     ...usdtConfig,
