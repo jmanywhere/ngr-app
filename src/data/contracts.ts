@@ -18,6 +18,12 @@ const TEST_GROW = "0x2E0347eC54BF7c3758bAb1faB409Bc758f2765B9";
 const TEST_MINER = "0x958662BE83cbCe9aa453D50E89e99A02bCa37B22";
 const MINER = "0x92675a293b64F87955997F856242880D6A459A89";
 
+export const pGrowToken = "0x1bd86894a52D78071f14b06BaeD48E9b32fC15aE";
+export const pNGR = "0xDb389472Ebc2b6aE8a9D9E72a70d65E9307b5c65"
+export const pDrip ="0x5c86bf497cA0EfdF4b3F4f998713E56a8701377d"
+export const pMiner = "0x32d404b6297a5983eB11fA92dd8Bf390dA481Fd3"
+export const DAI = "0xefD766cCb38EaF1dfd701853BFCe31359239F305"
+
 export const ngrConfig = {
   address: ngrContract,
   abi: NgrAbi,
