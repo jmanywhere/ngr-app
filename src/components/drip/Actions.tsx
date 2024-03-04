@@ -1,5 +1,5 @@
 "use client";
-import { dripNGR, dripGrowConfig, usdtConfig } from "@/data/contracts";
+import { dripNGR, dripGrowConfig, usdtConfig, DAI, pDrip } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import classNames from "classnames";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import {
 } from "viem";
 import {
   useAccount,
+  useChainId,
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
@@ -21,28 +22,34 @@ import {
 export default function DripActions() {
   const { address } = useAccount();
   const [depositAmount, setDepositAmount] = useState("");
-
+  const chainId = useChainId();
   const { data: userInfo } = useContractReads({
     contracts: [
       {
         ...usdtConfig,
         functionName: "balanceOf",
         args: [address || zeroAddress],
+        address: chainId ===56 ? usdtConfig.address : DAI,
       },
       {
         ...usdtConfig,
         functionName: "allowance",
-        args: [address || zeroAddress, dripNGR],
+        args: [address || zeroAddress, 
+          chainId ===56 ? dripGrowConfig.address : pDrip,
+        ],
+        address: chainId ===56 ? usdtConfig.address : DAI,
       },
       {
         ...dripGrowConfig,
         functionName: "claimable",
         args: [address || zeroAddress],
+        address: chainId ===56 ? dripGrowConfig.address : pDrip,
       },
       {
         ...dripGrowConfig,
         functionName: "users",
         args: [address || zeroAddress],
+        address: chainId ===56 ? dripGrowConfig.address : pDrip,
       },
     ],
     watch: true,
@@ -51,7 +58,11 @@ export default function DripActions() {
   const { config: approveConfig } = usePrepareContractWrite({
     ...usdtConfig,
     functionName: "approve",
-    args: [dripNGR, maxUint256],
+    args: [
+      chainId ===56 ? dripNGR : pDrip,
+      maxUint256
+    ],
+    address: chainId ===56 ? usdtConfig.address : DAI,
   });
 
   const { config: depositConfig, error: depositError } =
@@ -59,16 +70,19 @@ export default function DripActions() {
       ...dripGrowConfig,
       functionName: "deposit",
       args: [parseEther(depositAmount) || 0n],
+      address: chainId ===56 ? dripNGR : pDrip,
     });
 
   const { config: claimConfig } = usePrepareContractWrite({
     ...dripGrowConfig,
     functionName: "claim",
+    address: chainId ===56 ? dripNGR : pDrip,
   });
   const { config: quitConfig, error: quitConfigError } =
     usePrepareContractWrite({
       ...dripGrowConfig,
       functionName: "quit",
+      address: chainId ===56 ? dripNGR : pDrip,
     });
 
   const {
@@ -134,6 +148,8 @@ export default function DripActions() {
       ? (userInfoParsed.allowance || 0n) >= parseEther(depositAmount || "0")
       : (userInfoParsed.allowance || 0n) >= parseEther("100");
 
+  const usedTokenSymbol = chainId === 56 ? "USDT" : "DAI";
+
   return (
     <div className="text-white/90 px-4 py-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 max-w-[90vw]">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
@@ -169,7 +185,7 @@ export default function DripActions() {
             <label className="label">
               <span className="label-text-alt">Wallet:</span>
               <span className="label-text-alt">
-                {formatTokens(userInfoParsed.usdtBalance)} USDT
+                {formatTokens(userInfoParsed.usdtBalance)} {usedTokenSymbol}
               </span>
             </label>
           </div>
@@ -216,7 +232,7 @@ export default function DripActions() {
             <p className="stat-value text-center">
               {formatTokens(userInfoParsed.claimable, 4)}
             </p>
-            <p className="stat-desc text-center">USDT</p>
+            <p className="stat-desc text-center">{usedTokenSymbol}</p>
           </div>
           <hr className="mt-0 mb-4 w-full" />
           <button
@@ -244,7 +260,7 @@ export default function DripActions() {
           </div>
           <div className="collapse-content flex flex-col items-center">
             <p className="text-xs max-w-[250px] text-justify pb-4">
-              Quitting means you will retrieve all your current GROW as USDT.
+              Quitting means you will retrieve all your current GROW as {usedTokenSymbol}.
               You will be charged a 5% sell fee and a 10% handler fee. Make sure
               you are 100% certain before quitting.
             </p>

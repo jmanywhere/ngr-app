@@ -1,11 +1,12 @@
 "use client";
 
-import { dripGrowConfig } from "@/data/contracts";
+import { dripGrowConfig, pDrip } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import formatDuration from "date-fns/formatDuration";
 import intervalToDuration from "date-fns/intervalToDuration";
 import { useImmer } from "use-immer";
 import {
+  useChainId,
   useContractRead,
   useContractReads,
   useContractWrite,
@@ -17,19 +18,22 @@ export default function DripLiquidatorTable(props: {
   users: Array<`0x${string}`>;
 }) {
   const { users } = props;
+  const chainId = useChainId();
   const [selectedIds, setSelectedIds] = useImmer<
     Array<{ address: `0x${string}`; reward: bigint }>
   >([]);
   const { data: liquidationThreshold } = useContractRead({
     ...dripGrowConfig,
     functionName: "liquidationThresholdHours",
+    address: chainId === 56 ? dripGrowConfig.address : pDrip,
   });
   const { data: liquidationInfo } = useContractReads({
     contracts: users.map((user) => ({
       ...dripGrowConfig,
       functionName: "users",
       args: [user],
-    })),
+    address: chainId === 56 ? dripGrowConfig.address : pDrip,
+  })),
     watch: true,
   });
 
@@ -38,7 +42,8 @@ export default function DripLiquidatorTable(props: {
       ...dripGrowConfig,
       functionName: "liquidateUsers",
       args: [selectedIds.map((item) => item.address)],
-    });
+    address: chainId === 56 ? dripGrowConfig.address : pDrip,
+  });
   const {
     write: liquidate,
     data: liquidateData,

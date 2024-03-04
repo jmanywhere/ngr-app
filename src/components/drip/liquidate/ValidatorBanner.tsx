@@ -1,17 +1,18 @@
 "use client";
 
-import { dripGrowConfig } from "@/data/contracts";
+import { dripGrowConfig, pDrip } from "@/data/contracts";
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useChainId, useContractRead } from "wagmi";
 
 export default function ValidatorBanner() {
   const { address } = useAccount();
-
+  const chainId = useChainId();
   const { data: user } = useContractRead({
     ...dripGrowConfig,
     functionName: "users",
     args: [address || zeroAddress],
+    address: chainId === 56 ? dripGrowConfig.address : pDrip,
   });
   if ((user?.[0] || 0n) > 0n)
     return (
