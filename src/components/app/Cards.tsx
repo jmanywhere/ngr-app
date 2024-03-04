@@ -2,6 +2,7 @@
 
 import {
   useAccount,
+  useChainId,
   useContractRead,
   useContractReads,
   useContractWrite,
@@ -29,73 +30,90 @@ import {
   ngrGrowConfig,
   growConfig,
   usdtConfig,
+  DAI,
+  pGrowToken,
+  pNGR,
 } from "@/data/contracts";
 import Link from "next/link";
 import { useImmer } from "use-immer";
 
 export const StatsCard = () => {
   const { address } = useAccount();
+  const chainId = useChainId();
   const { data: ngrData, refetch: ngrDataRefetch } = useContractReads({
     contracts: [
       {
         ...usdtConfig,
         functionName: "balanceOf",
-        args: [growToken],
+        args: [chainId === 56 ? growToken : pGrowToken],
+        address: chainId === 56 ? usdtConfig.address : DAI,
       },
       {
         ...ngrGrowConfig,
         functionName: "isLiquidator",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...growConfig,
         functionName: "calculatePrice",
+        address: chainId === 56 ? growToken : pGrowToken,
       },
       {
         ...ngrGrowConfig,
         functionName: "totalLiquidations",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "totalDeposits",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrConfig,
         // functionName: "currentUserPendingLiquidation",
         functionName: "userToLiquidate",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrConfig,
         functionName: "depositCounter",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "getUserPositions",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "userStats",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrConfig,
         functionName: "totalDeposits",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "getUserMainPositions",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "getUserPositionsInfo",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "autoReinvest",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
     ],
   });
@@ -302,6 +320,7 @@ const PositionRow = (props: {
   liqDuration?: string | null;
   canLiquidate?: boolean;
 }) => {
+  const chainId = useChainId();
   const {
     positionId: posId,
     depositAmount,
@@ -320,6 +339,7 @@ const PositionRow = (props: {
       functionName: "earlyExit",
       args: [posId],
       enabled: !isLiquidated,
+      address: chainId === 56 ? ngrGrowConfig.address : pNGR,
     });
 
   const { write: exit, data: exitData } = useContractWrite(
@@ -395,28 +415,37 @@ export const ActionsCard = (props: {
 }) => {
   const { refetchOther, tcv, isAutoReinvesting } = props;
   const { address } = useAccount();
+  const chainId = useChainId();
   const { data: usdtBalance, refetch: usdtRefetch } = useContractReads({
     contracts: [
       {
         ...usdtConfig,
         functionName: "balanceOf",
         args: [address || zeroAddress],
+        address: chainId === 56 ? usdtConfig.address : DAI,
       },
       {
         ...usdtConfig,
         functionName: "allowance",
-        args: [address || zeroAddress, growNGR],
+        args: [address || zeroAddress, chainId === 56 ? growNGR : pNGR],
+        address: chainId === 56 ? usdtConfig.address : DAI,
       },
     ],
   });
+
+  console.log(usdtBalance)
 
   const [depositAmount, setDepositAmount] = useState(0);
 
   const { config: prepApproveConfig } = usePrepareContractWrite({
     ...usdtConfig,
     functionName: "approve",
-    args: [growNGR, parseEther(`${1000000}`)],
+    args: [
+      chainId === 56 ? growNGR : pNGR,
+      parseEther(`${1000000}`)
+    ],
     onSuccess: refetchOther,
+    address: chainId === 56 ? usdtConfig.address : DAI,
   });
 
   const { config: depositConfig, error: prepDepositError } =
@@ -425,12 +454,14 @@ export const ActionsCard = (props: {
       functionName: "deposit",
       args: [parseEther(`${depositAmount}`), isAutoReinvesting],
       onSuccess: refetchOther,
+      address: chainId === 56 ? usdtConfig.address : DAI,
     });
   const { config: reinvestConfig } = usePrepareContractWrite({
     ...ngrGrowConfig,
     functionName: "changeAutoReinvest",
     args: [!isAutoReinvesting],
     onSuccess: refetchOther,
+    address: chainId === 56 ? ngrConfig.address : pNGR,
   });
 
   const { write: changeReinvest, data: reinvestData } = useContractWrite(
@@ -469,6 +500,8 @@ export const ActionsCard = (props: {
 
   const maxDeposit = 25;
 
+  const tokenSymbol = chainId === 56 ? "USDT" : "DAI"
+
   return (
     <>
       <div className="text-white/90 px-4 pt-4 pb-2 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4">
@@ -489,7 +522,7 @@ export const ActionsCard = (props: {
               />
               <label className="label">
                 <span className="label-text-alt  font-semibold">
-                  Wallet USDT
+                  Wallet {tokenSymbol}
                 </span>
                 <span className="label-text-alt ">
                   {parseFloat(formatEther(userUSDTBalance)).toLocaleString()}
@@ -509,13 +542,13 @@ export const ActionsCard = (props: {
           {((depositAmount < 10 ||
             (depositAmount > maxDeposit && isApproved)) && (
             <>
-              <span className="text-sm text-error">Min Deposit: 10 USDT</span>
+              <span className="text-sm text-error">Min Deposit: 10 {tokenSymbol}</span>
               <span className="text-sm text-error">
                 Max of{" "}
                 {maxDeposit.toLocaleString(undefined, {
                   maximumFractionDigits: 0,
-                })}{" "}
-                USDT
+                })}&nbsp;
+                {tokenSymbol}
               </span>
             </>
           )) ||
@@ -589,11 +622,13 @@ export const ActionsCard = (props: {
 
 const MainDepositCard = () => {
   const { address } = useAccount();
+  const chainId = useChainId();
   const { data: userMainPositions } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getUserMainPositions",
     args: [address || zeroAddress],
     watch: true,
+    address: chainId === 56 ? ngrGrowConfig.address : pNGR,
   });
   const [selectedMainDeposit, setSelectedMainDeposit] = useImmer<Array<number>>(
     []
@@ -693,17 +728,20 @@ const PositionsTableBody = (props: {
   startPosition: bigint;
   endPosition: bigint;
 }) => {
+  const chainId = useChainId();
   const { data: segmentedPositions, isLoading } = useContractRead({
     ...ngrGrowConfig,
     functionName: "getPositions",
     args: [props.startPosition, props.endPosition - props.startPosition + 1n],
     enabled: props.open,
     scopeKey: `positions-${props.startPosition.toString()}-${props.endPosition.toString()}`,
+    address: chainId === 56 ? ngrGrowConfig.address : pNGR,
   });
   const { data: currentPrice } = useContractRead({
     ...growConfig,
     functionName: "calculatePrice",
     enabled: props.open,
+    address: chainId === 56 ? growToken : pGrowToken,
   });
 
   return (
