@@ -476,7 +476,7 @@ export function MinerStats() {
     ],
   });
 
-  const minerGrow = (data?.[0].result || 0n) + (data?.[1].result || 0n) as bigint;
+  const minerGrow = (data?.[0].result as bigint|undefined || 0n) + (data?.[1].result as bigint|undefined || 0n);
 
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-red-200 ">

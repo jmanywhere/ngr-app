@@ -61,7 +61,7 @@ export default function GrowStats() {
   const { price, usdt, supply, pricePLS, pSupply } = {
     pricePLS: growData?.[3].result as bigint | undefined,
     price: growData?.[2].result as bigint | undefined,
-    usdt: (growData?.[1].result || 0n) + (growData?.[4].result || 0n),
+    usdt: ((growData?.[1].result as bigint | undefined) || 0n) + ((growData?.[4].result as bigint | undefined) || 0n),
     supply: growData?.[0].result as bigint | undefined,
     pSupply: growData?.[5].result as bigint | undefined,
   };
@@ -143,9 +143,9 @@ export function FixedNGRStats(props: { liquidationDeposits: string }) {
     watch: true,
   });
   const { deposits, liquidations, supply } = {
-    deposits: (ngrData?.[0].result || 0n) as bigint + (ngrData?.[3].result || 0n) as bigint,
-    liquidations: ((ngrData?.[1].result || 0n) + (ngrData?.[4].result || 0n)) as bigint | undefined,
-    supply: ((ngrData?.[2].result || 0n) + (ngrData?.[5].result || 0n)) as bigint | undefined,
+    deposits: ((ngrData?.[0].result as bigint | undefined) || 0n) + ((ngrData?.[3].result as bigint | undefined) || 0n),
+    liquidations: (ngrData?.[1].result as bigint | undefined || 0n) + (ngrData?.[4].result as bigint | undefined || 0n),
+    supply: ((ngrData?.[2].result as bigint | undefined || 0n) + (ngrData?.[5].result as bigint | undefined || 0n)) ,
   };
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-blue-400">

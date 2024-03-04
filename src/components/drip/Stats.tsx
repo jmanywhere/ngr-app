@@ -59,10 +59,10 @@ export default function DripStats() {
     watch: true,
   });
   const statsData = {
-    deposits: (statData?.[0].result || 0n) + (statData?.[4].result || 0n),
-    claimed: (statData?.[1].result || 0n) + (statData?.[5].result || 0n),
-    activeDeposits: (statData?.[2].result || 0n) + (statData?.[6].result || 0n),
-    growInDrip: (statData?.[3].result || 0n) + (statData?.[7].result || 0n),
+    deposits: (statData?.[0].result as bigint | undefined || 0n) + (statData?.[4].result as bigint | undefined || 0n),
+    claimed: (statData?.[1].result as bigint | undefined || 0n) + (statData?.[5].result as bigint | undefined || 0n),
+    activeDeposits: (statData?.[2].result as bigint | undefined || 0n) + (statData?.[6].result as bigint | undefined || 0n),
+    growInDrip: (statData?.[3].result as bigint | undefined || 0n) + (statData?.[7].result as bigint | undefined || 0n),
   };
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-accent">
