@@ -1,11 +1,12 @@
 "use client";
 import {
+  useChainId,
   useContractRead,
   useContractReads,
   useContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { growConfig, ngrGrowConfig } from "@/data/contracts";
+import { growConfig, ngrGrowConfig, pGrowToken, pNGR } from "@/data/contracts";
 import { formatEther, parseEther } from "viem";
 import { useImmer } from "use-immer";
 import classNames from "classnames";
@@ -14,31 +15,38 @@ import { useMemo } from "react";
 
 export default function LiquidationsTable() {
   const [selectedIds, setSelectedIds] = useImmer<Array<number>>([]);
+  const chainId = useChainId();
   const { data: liquidationInfo } = useContractReads({
     contracts: [
       {
         ...growConfig,
         functionName: "calculatePrice",
+        address: chainId ===56  ? growConfig.address : pGrowToken,
       },
       {
         ...ngrGrowConfig,
         functionName: "queuePosition",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "liquidatorAmount",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "totalAmount",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "totalPaidToLiquidators",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
       {
         ...ngrGrowConfig,
         functionName: "currentPositionToLiquidate",
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
     ],
     watch: true,
@@ -76,6 +84,7 @@ export default function LiquidationsTable() {
     ...ngrGrowConfig,
     functionName: "liquidatePositions",
     args: [selectedIds.map((id) => BigInt(id))],
+    address: chainId === 56 ? ngrGrowConfig.address : pNGR,
     onSuccess: () => {
       setSelectedIds((draft) => {
         const length = draft.length;
