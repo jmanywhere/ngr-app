@@ -5,6 +5,8 @@ import {
   growConfig,
   minerConfig,
   ngrGrowConfig,
+  pGrowToken,
+  pMiner,
   usdtConfig,
 } from "@/data/contracts";
 import shortAddress, { formatTokens } from "@/utils/stringify";
@@ -437,11 +439,19 @@ export function MinerStats() {
         ...growConfig,
         functionName: "balanceOf",
         args: [minerConfig.address || zeroAddress],
+        chainId: 56,
+      },
+      {
+        ...growConfig,
+        functionName: "balanceOf",
+        address: pGrowToken,
+        args: [pMiner || zeroAddress],
+        chainId: 369,
       },
     ],
   });
 
-  const minerGrow = (data?.[0].result || 0n) as bigint;
+  const minerGrow = (data?.[0].result || 0n) + (data?.[1].result || 0n) as bigint;
 
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-red-200 ">

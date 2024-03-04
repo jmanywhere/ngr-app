@@ -1,8 +1,8 @@
 "use client";
-import { dripGrowConfig, dripNGR, growConfig } from "@/data/contracts";
+import { dripGrowConfig, dripNGR, growConfig, pDrip, pGrowToken } from "@/data/contracts";
 import { formatTokens } from "@/utils/stringify";
 import { formatEther, parseEther, zeroAddress } from "viem";
-import { useAccount, useContractReads } from "wagmi";
+import { useAccount, useChainId, useContractReads } from "wagmi";
 import intervalToDuration from "date-fns/intervalToDuration";
 import { useEffect, useState } from "react";
 
@@ -12,47 +12,76 @@ export default function DripStats() {
       {
         ...dripGrowConfig,
         functionName: "totalDeposits",
+        chainId: 56,
       },
       {
         ...dripGrowConfig,
         functionName: "totalClaimed",
+        chainId: 56,
       },
       {
         ...dripGrowConfig,
         functionName: "activeDeposits",
+        chainId: 56,
       },
       {
         ...growConfig,
         functionName: "balanceOf",
         args: [dripNGR],
+        chainId: 56,
+      },
+      {
+        ...dripGrowConfig,
+        address: pDrip,
+        functionName: "totalDeposits",
+        chainId: 369,
+      },
+      {
+        ...dripGrowConfig,
+        address: pDrip,
+        functionName: "totalClaimed",
+        chainId: 369,
+      },
+      {
+        ...dripGrowConfig,
+        address: pDrip,
+        functionName: "activeDeposits",
+        chainId: 369,
+      },
+      {
+        ...growConfig,
+        address: pGrowToken,
+        functionName: "balanceOf",
+        args: [pDrip],
+        chainId: 369,
       },
     ],
     watch: true,
   });
   const statsData = {
-    deposits: statData?.[0].result as bigint | undefined,
-    claimed: statData?.[1].result as bigint | undefined,
-    activeDeposits: statData?.[2].result as bigint | undefined,
-    growInDrip: statData?.[3].result as bigint | undefined,
+    deposits: (statData?.[0].result || 0n) + (statData?.[4].result || 0n),
+    claimed: (statData?.[1].result || 0n) + (statData?.[5].result || 0n),
+    activeDeposits: (statData?.[2].result || 0n) + (statData?.[6].result || 0n),
+    growInDrip: (statData?.[3].result || 0n) + (statData?.[7].result || 0n),
   };
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow text-accent">
       <div className="stat">
         <p className="stat-title">Total Deposits</p>
         <p className="stat-value">{formatTokens(statsData.deposits)}</p>
-        <p className="stat-desc">USDT</p>
+        <p className="stat-desc">USD</p>
       </div>
       <div className="stat">
         <p className="stat-title">Daily Payouts</p>
         <p className="stat-value">
           {formatTokens(((statsData.activeDeposits || 0n) * 5n) / 100_0n, 2)}
         </p>
-        <p className="stat-desc">USDT</p>
+        <p className="stat-desc">USD</p>
       </div>
       <div className="stat">
         <p className="stat-title">Total Claimed</p>
         <p className="stat-value">{formatTokens(statsData.claimed, 4)}</p>
-        <p className="stat-desc">USDT</p>
+        <p className="stat-desc">USD</p>
       </div>
       <div className="stat">
         <p className="stat-title">Total</p>
@@ -72,20 +101,24 @@ export function DripUserStats() {
     return () => clearInterval(interval);
   }, [setCurrentTime]);
   const { address } = useAccount();
+  const chainId = useChainId();
   const { data: userInfo } = useContractReads({
     contracts: [
       {
         ...dripGrowConfig,
+        address: chainId === 56 ? dripGrowConfig.address : pDrip,
         functionName: "users",
         args: [address || zeroAddress],
       },
       {
         ...dripGrowConfig,
+        address: chainId === 56 ? dripGrowConfig.address : pDrip,
         functionName: "liquidatorEarnings",
         args: [address || zeroAddress],
       },
       {
         ...growConfig,
+        address: chainId === 56 ? growConfig.address : pGrowToken,
         functionName: "calculatePrice",
       },
     ],
