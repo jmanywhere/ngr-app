@@ -1,12 +1,15 @@
 "use client";
 
 import {
+  DAI,
   dripGrowConfig,
   growConfig,
   minerConfig,
   ngrGrowConfig,
+  pDrip,
   pGrowToken,
   pMiner,
+  pNGR,
   usdtConfig,
 } from "@/data/contracts";
 import shortAddress, { formatTokens } from "@/utils/stringify";
@@ -27,10 +30,12 @@ import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
+  useChainId,
 } from "wagmi";
 
 export default function MinerInfo() {
   const { address } = useAccount();
+  const chainId = useChainId();
   const [depositAmount, setDepositAmount] = useState("");
   const params = useSearchParams();
   const referralAddress = params.get("ref");
@@ -40,48 +45,58 @@ export default function MinerInfo() {
         ...minerConfig,
         functionName: "user",
         args: [address || zeroAddress],
+        address: chainId === 56 ? minerConfig.address : pMiner,
       },
       {
         ...growConfig,
         functionName: "calculatePrice",
+        address: chainId === 56 ? growConfig.address : pGrowToken,
       },
       {
         ...growConfig,
         functionName: "balanceOf",
-        args: [minerConfig.address || zeroAddress],
+        args: [chainId === 56 ? minerConfig.address :  pMiner],
+        address: chainId === 56 ? growConfig.address : pGrowToken,
       },
       {
         ...minerConfig,
         functionName: "getEggs",
         args: [address || zeroAddress],
+        address: chainId === 56 ? minerConfig.address : pMiner,
       },
       {
         ...minerConfig,
         functionName: "marketEggs",
+        address: chainId === 56 ? minerConfig.address : pMiner,
       },
       {
         ...usdtConfig,
         functionName: "balanceOf",
         args: [address || zeroAddress],
+        address: chainId === 56 ? usdtConfig.address : DAI,
       },
       {
         ...usdtConfig,
         functionName: "allowance",
-        args: [address || zeroAddress, minerConfig.address || zeroAddress],
+        args: [address || zeroAddress, chainId === 56 ? minerConfig.address : pMiner],
+        address: chainId === 56 ? usdtConfig.address : DAI,
       },
       {
         ...minerConfig,
         functionName: "getLiquidatableUsers",
+        address: chainId === 56 ? minerConfig.address : pMiner,
       },
       {
         ...dripGrowConfig,
         functionName: "users",
         args: [address || zeroAddress],
+        address: chainId === 56 ? dripGrowConfig.address : pDrip,
       },
       {
         ...ngrGrowConfig,
         functionName: "userStats",
         args: [address || zeroAddress],
+        address: chainId === 56 ? ngrGrowConfig.address : pNGR,
       },
     ],
     watch: true,
@@ -128,7 +143,11 @@ export default function MinerInfo() {
   const { config: approveConfig } = usePrepareContractWrite({
     ...usdtConfig,
     functionName: "approve",
-    args: [minerConfig.address, maxUint256],
+    args: [
+      chainId === 56 ? minerConfig.address : pMiner,
+      maxUint256
+    ],
+    address: chainId === 56 ? usdtConfig.address : DAI,
   });
 
   const { config: depositConfig, error: depositError } =
@@ -141,22 +160,26 @@ export default function MinerInfo() {
           ? referralAddress
           : zeroAddress,
       ],
+      address: chainId === 56 ? minerConfig.address : pMiner,
     });
 
   const { config: claimConfig } = usePrepareContractWrite({
     ...minerConfig,
     functionName: "claimFromMine",
+    address: chainId === 56 ? minerConfig.address : pMiner,
   });
   const { config: compoundConfig, error: compoundConfigError } =
     usePrepareContractWrite({
       ...minerConfig,
       functionName: "compoundResources",
+      address: chainId === 56 ? minerConfig.address : pMiner,
     });
   const { config: liquidationConfig, error: liquidationConfigError } =
     usePrepareContractWrite({
       ...minerConfig,
       functionName: "liquidateUsers",
       args: [liquidUsers?.[0] || []],
+      address: chainId === 56 ? minerConfig.address : pMiner,
     });
 
   const {
@@ -222,13 +245,15 @@ export default function MinerInfo() {
     approveLoading ||
     approveTxLoading;
 
+  const usedTokenSymbol = chainId === 56 ? "USDT" : "DAI";
+
   return (
     <>
       <div className="stats stats-vertical md:stats-horizontal shadow text-primary ">
         <div className="stat">
           <p className="stat-title text-slate-300">Grow Price</p>
           <p className="stat-value">{formatTokens(price, 6)}</p>
-          <p className="stat-desc">USDT</p>
+          <p className="stat-desc">{usedTokenSymbol}</p>
         </div>
         <div className="stat">
           <p className="stat-title text-slate-300">TVL</p>
@@ -273,7 +298,7 @@ export default function MinerInfo() {
         <div className="stat">
           <p className="stat-title text-slate-300">Total Redeemed</p>
           <p className="stat-value text-rose-400">{formatTokens(claimed, 2)}</p>
-          <p className="stat-desc text-slate-300">USDT</p>
+          <p className="stat-desc text-slate-300">{usedTokenSymbol}</p>
         </div>
       </div>
       <div className="text-white/90 px-4 py-4 rounded-lg border-2 border-black flex flex-col items-center bg-slate-800/80 mb-4 max-w-[90vw]">
@@ -306,7 +331,7 @@ export default function MinerInfo() {
           <label className="label">
             <span className="label-text-alt">Wallet:</span>
             <span className="label-text-alt">
-              {formatTokens(usdtBalance)} USDT
+              {formatTokens(usdtBalance)} {usedTokenSymbol}
             </span>
           </label>
         </div>
